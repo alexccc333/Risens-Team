@@ -67,6 +67,10 @@ class GetManga extends Main {
 				$i++;
 				$row = $result->fetch_assoc();
 			}
+			
+			$this->_allIds = array_reverse($this->_allIds);
+			$this->_allNames = array_reverse($this->_allNames);
+			
 			if (!isset($_GET['chapter'])) {
 				$currentChapter = count($this->_allNames) - 1;
 			}
@@ -89,7 +93,7 @@ class GetManga extends Main {
 		$logger = new Log($this->_mysqli);
 		$logger->doLog($this);
 		
-		echo '<body>';
+		echo '<body style="background-color: #354050;">';
 		
 		$this->_printPagesAndDownloadLink();
 		
@@ -99,7 +103,7 @@ class GetManga extends Main {
 		echo file_get_contents('Scripts/MangaSelector.js');
 		echo '</script>';
 		
-		echo '<a href="" target="_blank"><img src="images/lupa.png" width="32px" height="32px" style="cursor: pointer;"></a><br>';
+		echo '<a href="" target="_blank"><img src="http://risensteam.ru/images/lupa.png" width="32px" height="32px" style="cursor: pointer;"></a><br>';
 		echo '<img id="before" style="display: none;">';
 		echo '<a id="link"><img id="current" onclick="change_page_next();" style="cursor: pointer; margin: 0 auto;" class="img-responsive"></a>';
 		echo '<img id="after" style="display: none;"><img id="original" style="display: none;"><br><br>';
@@ -111,27 +115,34 @@ class GetManga extends Main {
 		echo file_get_contents('Scripts/MangaReader.js');
 		echo '</script><br>';
 			
-		if (isset($this->_allIds[$this->_currentChapter - 1])) {
-			echo '<a type="button" class="btn btn-primary btn-lg btn-success" href="?id=' . $this->_id . '&chapter=' . $this->_allIds[$this->_currentChapter - 1] . '">Предыдущая глава</a> ';
+		$tempIds = array_reverse($this->_allIds);
+		$tempNames = array_reverse($this->_allNames);
+		
+		if (isset($tempIds[$this->_currentChapter - 1])) {
+			echo '<a type="button" class="btn btn-primary btn-lg btn-success" href="?id=' . $this->_id . '&chapter=' . $tempIds[$this->_currentChapter - 1] . '">Предыдущая глава</a> ';
 		}
 		else {
 			echo '<a type="button" class="btn btn-primary btn-lg btn-success disabled">Предыдущая глава</a> ';
 		}
 		echo '<select data-live-search="true" data-size="10" id="selchap" data-dropup-auto="false"  class="selectpicker dropup" onChange="location.href=\'?id=' . $this->_id;
-		echo '&chapter=\' + this.options[this.selectedIndex].value;';
-		for ($i = 0; $i < count($this->_allNames); $i++) {
-			echo '<option value="' . $this->_allIds[$i] . '">' . $this->_allNames[$i] . "</option>";
+		echo '&chapter=\' + this.options[this.selectedIndex].value;"';
+		for ($i = 0; $i < count($tempNames); $i++) {
+			if ($i === $this->_currentChapter) {
+				echo '<option selected value="' . $tempIds[$i] . '">' . $tempNames[$i] . "</option>";
+			}
+			else {
+				echo '<option value="' . $tempIds[$i] . '">' . $tempNames[$i] . "</option>";
+			}
 		}
 		echo '</select>';
 		
-		if (isset($this->_allIds[$this->_currentChapter + 1])) {
-			echo '<a type="button" class="btn btn-primary btn-lg btn-success" href="?id=' . $this->_id . '&chapter=' . $this->_allIds[$this->_currentChapter + 1] . '">Следующая глава</a>';
+		if (isset($tempIds[$this->_currentChapter + 1])) {
+			echo '<a type="button" class="btn btn-primary btn-lg btn-success" href="?id=' . $this->_id . '&chapter=' . $tempIds[$this->_currentChapter + 1] . '">Следующая глава</a>';
 		}
 		else {
 			echo '<a type="button" class="btn btn-primary btn-lg btn-success disabled">Следующая глава</a> ';
 		}
 		
-		echo '<br><script>document.getElementById("selchap").selectedIndex=' . $this->_currentChapter . ';</script>';
 		echo '</div></div></div></body>';
 	}
 	
@@ -144,7 +155,7 @@ class GetManga extends Main {
 	}
 	
 	protected function _printPagesAndDownloadLink() {
-		echo '<h3>' . $this->_data[self::CHAPTER_NAME] . '</h3>';
+		echo '<h3 style="color: white">' . $this->_data[self::CHAPTER_NAME] . '</h3>';
 		echo '<script>';
 		echo 'var pages = [' . $this->_data[self::PAGES] . '];' . PHP_EOL;
 		echo 'var dl = "' . $this->_data[self::DOWNLOAD_LINK] . '";';

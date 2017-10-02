@@ -22,7 +22,7 @@ class Log {
 		if ($instance instanceof GetManga) {
 			$name = $instance->getName();
 			$chapterName = $instance->getChapterAlias();
-			$logString = 'Manga = ' . $name . ' | Chapter = ' . $chapterName . ' FROM' . $ip;
+			$logString = 'Manga = ' . $name . ' | Chapter = ' . $chapterName . ' FROM ' . $ip;
 			
 			$this->_insert($logString);
 		}
