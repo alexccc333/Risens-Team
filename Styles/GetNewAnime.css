@@ -1,0 +1,100 @@
+select#episodes, select#episodes-color, select#subdub, select#subdub-color, select#players, select#players-color 
+{
+   -webkit-appearance: button;
+   background-image: url(http://i62.tinypic.com/15xvbd5.png), -webkit-linear-gradient(#FAFAFA, #F4F4F4 40%, #E5E5E5);
+   background-position: 97% center;
+   background-repeat: no-repeat;
+   border: 1px solid #AAA;
+   color: #555;
+   font-size: inherit;
+   overflow: hidden;
+   padding: 5px 10px;
+   text-overflow: ellipsis;
+   white-space: nowrap;
+   width: 120px;
+   height: 30px;
+}
+
+#player
+{
+    
+	display: none;
+}
+
+#selectors
+{
+    
+	position: absolute;
+	top: 12px;
+	left: 10px;
+	background-color: white;
+	opacity: 0.5; 
+    filter: alpha(Opacity=50); 
+    -webkit-transition: .5s all;   
+    -webkit-transition-delay: 5s; 
+    -moz-transition: .5s all;   
+    -moz-transition-delay: 5s; 
+    -ms-transition: .5s all;   
+    -ms-transition-delay: 5s; 
+    -o-transition: .5s all;   
+    -o-transition-delay: 5s; 
+    transition: .5s all;   
+    transition-delay: 5s; 
+}
+
+
+#selectors:hover
+{
+    opacity: 1; 
+    filter: alpha(Opacity=100); 
+    -webkit-transition-delay: 0s;
+    -moz-transition-delay: 0s;
+    -ms-transition-delay: 0s;
+    -o-transition-delay: 0s;
+    transition-delay: 0s;
+}
+
+
+#hover
+{
+    border: 0px solid #00000;
+	background-color: black;
+    position:relative;
+    cursor:pointer;
+    background-position: center;
+   	background-repeat: no-repeat;
+}
+#hover:before 
+{
+    content:'';
+    position:absolute;
+    top:50%;
+    left:50%;
+    margin-top: -25px;
+    margin-left: -35px;
+    height:60px;
+    width:80px;
+    border-radius:10px;
+    border:1px solid #000;
+    text-align:center;
+    line-height:30px;
+    background:#3AA8FF;
+    transition:all 200ms ease-in;
+}
+#hover:after 
+{
+    content:'';
+    position:absolute;
+    top:50%;
+    left:50%;
+    display:inline-block;
+    width: 0;
+    height: 0;
+    border-top: 6px solid transparent;
+    border-left: 12px solid #fff;
+    border-bottom: 6px solid transparent;
+}
+#hover:hover:before 
+{
+    background:orange;
+}
