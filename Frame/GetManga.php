@@ -125,7 +125,8 @@ class GetManga extends Main {
 			echo '<a type="button" class="btn btn-primary btn-lg btn-success disabled">Предыдущая глава</a> ';
 		}
 		echo '<select data-live-search="true" data-size="10" id="selchap" data-dropup-auto="false"  class="selectpicker dropup" onChange="location.href=\'?id=' . $this->_id;
-		echo '&chapter=\' + this.options[this.selectedIndex].value;"';
+		echo '&chapter=\' + this.options[this.selectedIndex].value;">';
+		
 		for ($i = 0; $i < count($tempNames); $i++) {
 			if ($i === $this->_currentChapter) {
 				echo '<option selected value="' . $tempIds[$i] . '">' . $tempNames[$i] . "</option>";
