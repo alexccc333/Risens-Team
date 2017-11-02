@@ -41,7 +41,7 @@ class GetAnime extends Main {
 	
 	public function getData() {
 		if (!$this->_data) {
-			$sql     = 'SELECT * FROM episodes WHERE anime_id = ' . $this->_id . 
+			$sql = 'SELECT * FROM episodes WHERE anime_id = ' . $this->_id . 
 						' ORDER BY (number+0) DESC';
 			$result = $this->_mysqli->query($sql);
 
