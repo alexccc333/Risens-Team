@@ -3,13 +3,19 @@
 include 'bd.php';
 include 'Admin/LoginForm.php';
 include 'Admin/User.php';
+include 'Frame/Extension.php';
+include 'Admin/header.php';
 
 $currentUser = new User();
 $form = new LoginForm();
+
+$form->setHead($head);
+$form->printHead();
+
 if (isset($_POST['login']) && isset($_POST['password'])) {
     $login = strtolower($_POST['login']);
     $pass = hash('sha512', $_POST['password'] . $salt);
-    $currentUser->login($login, $pass, $mysqli);
+    $status = $currentUser->login($login, $pass, $mysqli);
 }
 elseif (isset($_GET['logout'])) {
     unset($_COOKIE['user_cookie']);
@@ -19,9 +25,5 @@ elseif (isset($_COOKIE['user_cookie'])) {
     $currentUser->loginByCookie($_COOKIE['user_cookie'], $mysqli);
 }
 
-if ($currentUser->isAnon()){ 
-    $form->printForm();
-    return 0;
-}
-
-$form->printLogOut();
+$form->setUser($currentUser);
+$form->printBody();

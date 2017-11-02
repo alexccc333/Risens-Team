@@ -13,7 +13,12 @@ class User {
 	protected $_availableManga = array();
 	
 	protected $_adapter = null;
-	protected $_isLogged = false;
+    
+    const LOGGED_SUCCESS = 2;
+    const LOGGED_FAILED = 1;
+    const NOT_LOGGED = 0;
+    
+	protected $_isLogged = 0;
 	
 	public function __construct() {
 		$this->_role = UserEnum::ROLE_ANON;
@@ -21,9 +26,9 @@ class User {
 	
     public function login($login, $password, $mysqli) {
         $this->_adapter = new UserDataAdapter($mysqli);
-        $this->_tryLogin($login, $password);
+        $status = $this->_tryLogin($login, $password);
         
-        if ($this->_isLogged) {
+        if ($status) {
             $toFetch = $this->_adapter->getDataForUser($this->_id);
             $this->_fillUser($toFetch);
             
@@ -32,27 +37,34 @@ class User {
                 $this->_cookie = $cookie;
                 setcookie('user_cookie', $cookie, time()+60*60*24*7);
             }
+            $this->_isLogged = self::LOGGED_SUCCESS;
         }
-        else {
-            throw new Exception('Could not login');
-        }
+        
+        $this->_isLogged = self::LOGGED_FAILED;
     }
 
 
     public function loginByCookie($hashCookie, $mysqli) {
 		$this->_adapter = new UserDataAdapter($mysqli);
         $toFetch = $this->_adapter->getUserByCookie($hashCookie);
-        $this->_fillUser($toFetch);
+        if ($toFetch) {
+            $this->_fillUser($toFetch);
+            $this->_isLogged = self::LOGGED_SUCCESS;
+        }
+        
+        $this->_isLogged = self::LOGGED_FAILED;
 	}
 	
 	protected function _tryLogin($login, $password) {
 		$this->_id = $this->_adapter->checkLoginInformationAndGetId($login, $password);
-		if ($this->_id !== 0) {
-			$this->_isLogged = true;
+		if ($this->_id && $this->_id !== 0) {
+			return true;
 		}
+        return false;
 	}
 	
 	protected function _fillUser($toFetch) {
+        $this->_id = $toFetch[UserEnum::COL_ID];
 		$this->_role = $toFetch[UserEnum::COL_ROLE];
 		$this->_name = $toFetch[UserEnum::COL_NAME];
 		$this->_availableAnime = explode(',', $toFetch[UserEnum::COL_AVAIL_ANIME]);
@@ -61,6 +73,10 @@ class User {
 	}
     
     public function isAnon() {
-        return $this->_role === UserEnum::ROLE_ANON;
+        return !$this->_id || $this->_role === UserEnum::ROLE_ANON;
+    }
+    
+    public function isLogged() {
+        return $this->_isLogged;
     }
 }
