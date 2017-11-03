@@ -112,4 +112,12 @@ class UserDataAdapter extends DataAdapter {
     public function getAnimeAdapter() {
         return new AnimeDataAdapter($this->_mysqli);
     }
+    
+    public function getMangaAdapter() {
+        return new MangaDataAdapter($this->_mysqli);
+    }
+    
+    public function getEpisodeAdapter() {
+        return new EpisodeDataAdapter($this->_mysqli);
+    }
 }

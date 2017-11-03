@@ -91,4 +91,12 @@ class User {
     public function getName() {
         return $this->_name;
     }
+    
+    public function getAvailAnime() {
+        return $this->_availableAnime;
+    }
+    
+    public function getAvailManga() {
+        return $this->_availableManga;
+    }
 }

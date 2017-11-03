@@ -1,13 +1,12 @@
 <?php
-include 'Admin\DataAdapter.php';
 
-class AnimeDataAdapter extends DataAdapter {
+class MangaDataAdapter extends DataAdapter {
     const COL_ID = 'id';
     const COL_NAME = 'name';
-    const COL_BANNER = 'poster';
+    const COL_FOLDER = 'folder';
     
-    public function getAllAnimes() {
-        $sql = $this->_mysqli->prepare('SELECT id, name from anime');
+    public function getAllMangas() {
+        $sql = $this->_mysqli->prepare('SELECT id, name from manga');
         $status = $sql->execute();
         
         if ($status) {
@@ -25,8 +24,8 @@ class AnimeDataAdapter extends DataAdapter {
         }
     }
     
-    public function getAnimeById($id) {
-        $sql = $this->_mysqli->prepare('SELECT name, poster from anime WHERE id=?');
+    public function getMangaById($id) {
+        $sql = $this->_mysqli->prepare('SELECT name, folder from manga WHERE id=?');
         $sql->bind_param('i', $id);
         $status = $sql->execute();
 		
@@ -41,24 +40,24 @@ class AnimeDataAdapter extends DataAdapter {
 		return false;
     }
     
-    public function updateAnime($id, $name, $bannerUrl) {
-        $sql = $this->_mysqli->prepare('UPDATE `anime` SET `name`=?,`poster`=? WHERE `id`=?');
-        $sql->bind_param('ssi', $name, $bannerUrl, $id);
+    public function updateManga($id, $name, $folder) {
+        $sql = $this->_mysqli->prepare('UPDATE `manga` SET `name`=?,`folder`=? WHERE `id`=?');
+        $sql->bind_param('ssi', $name, $folder, $id);
         $status = $sql->execute();
         
         return $status;
     }
     
-    public function createNewAnime($name, $bannerUrl) {
-        $sql = $this->_mysqli->prepare('INSERT INTO `anime`(`id`, `name`, `poster`) VALUES(NULL,?,?)');
-        $sql->bind_param('ss', $name, $bannerUrl);
+    public function createNewManga($name, $folder) {
+        $sql = $this->_mysqli->prepare('INSERT INTO `manga`(`id`, `name`, `folder`) VALUES(NULL,?,?)');
+        $sql->bind_param('ss', $name, $folder);
         $status = $sql->execute();
         
         return $status;
     }
     
-    public function removeAnime($id) {
-        $sql = $this->_mysqli->prepare('DELETE FROM `anime` WHERE `id` = ?');
+    public function removeManga($id) {
+        $sql = $this->_mysqli->prepare('DELETE FROM `manga` WHERE `id` = ?');
         $sql->bind_param('i', $id);
         $status = $sql->execute();
         
