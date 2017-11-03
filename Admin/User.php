@@ -87,4 +87,8 @@ class User {
     public function getAdapter() {
         return $this->_adapter;
     }
+    
+    public function getName() {
+        return $this->_name;
+    }
 }

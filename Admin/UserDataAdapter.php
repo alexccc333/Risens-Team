@@ -1,12 +1,6 @@
 <?php
 
-class UserDataAdapter {
-	protected $_mysqli = null;
-		
-	public function __construct($mysqli) {
-		$this->_mysqli = $mysqli;
-	}
-	
+class UserDataAdapter extends DataAdapter {	
 	public function getDataForUser($id) {
 		$sql = $this->_mysqli->prepare('SELECT * FROM users WHERE id =?');
         $sql->bind_param('i', $id);
@@ -113,5 +107,9 @@ class UserDataAdapter {
             
 			return $returnArray;
         }
+    }
+    
+    public function getAnimeAdapter() {
+        return new AnimeDataAdapter($this->_mysqli);
     }
 }
