@@ -14,4 +14,5 @@ class UserEnum extends Enum {
 	const COL_AVAIL_ANIME = 'available_anime';
 	const COL_AVAIL_MANGA = 'available_manga';
 	const COL_COOKIE = 'cookie';
+    const COL_ACTIVE = 'active';
 }

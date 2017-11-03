@@ -5,6 +5,6 @@ if ($mysqli->connect_errno) {
 }
 else {
     $mysqli->set_charset("utf8");
-    $salt = 'u2yDJR5aHTmrctQLwWFQUVCX7jWt7v4s9YEXkwkQ';
+    define('SALT', 'u2yDJR5aHTmrctQLwWFQUVCX7jWt7v4s9YEXkwkQ');
 }
 ?>

@@ -79,4 +79,12 @@ class User {
     public function isLogged() {
         return $this->_isLogged;
     }
+    
+    public function getRole() {
+        return $this->_role;
+    }
+    
+    public function getAdapter() {
+        return $this->_adapter;
+    }
 }
