@@ -3,6 +3,7 @@ include 'Frame/Main.php';
 include 'Admin/AnimeDataAdapter.php';
 include 'Admin/MangaDataAdapter.php';
 include 'Admin/EpisodeDataAdapter.php';
+include 'Admin/ChapterDataAdapter.php';
 
 class Router extends Main {
     protected $_currentUser;
@@ -81,6 +82,9 @@ class Router extends Main {
                     break;
                 case self::ROUTE_UPLOAD_EPISODE:
                     $this->_printUploadEpisodeMenu();
+                    break;
+                case self::ROUTE_UPLOAD_CHAPTER:
+                    $this->_printUploadChapterMenu();
                     break;
                 case self::ROUTE_NAVIGATE:
                 default:
@@ -225,7 +229,7 @@ class Router extends Main {
             echo 'Роль: <input type="text" required name="role" id="role" value="' . $user[UserEnum::COL_ROLE] . '" /> (1 - менеджер, 2 - админ, 3 - мега админ)<br>';
             echo 'Разрешенные для редактирования аниме: <input type="text" name="availAnime" id="availAnime" value="' . $user[UserEnum::COL_AVAIL_ANIME] . '" />(айдишники через запятую)<br>';
             echo 'Разрешенная для редактирования манга: <input type="text" name="availManga" id="availManga" value="' . $user[UserEnum::COL_AVAIL_MANGA] . '" />(айдишники через запятую)<br>';
-            echo '<input type="submit" value="Submit"><br>';
+            echo '<input type="submit" value="Submit"><hr>';
             if ($user[UserEnum::COL_ACTIVE]) {
                 echo '<a href="adminpanel.php?go=' . self::ROUTE_EDIT_USER_PRIVILEGES . '&set_id=' . $id . '&delete_user">Удалить</a>';
             }
@@ -293,7 +297,7 @@ class Router extends Main {
             echo '<form action="adminpanel.php?go=' . self::ROUTE_EDIT_ANIME . '&set_id=' . $id . '" method="post">';
             echo 'Название аниме (англ.): <input type="text" required name="anime_name" id="name" value="' . $anime[AnimeDataAdapter::COL_NAME] . '" /><br>';
             echo 'Полный путь до баннера: <input type="text" name="banner_url" id="banner" value="' . $anime[AnimeDataAdapter::COL_BANNER] . '" /><br>';
-            echo '<input type="submit" value="Submit"><br>';
+            echo '<input type="submit" value="Submit"><hr>';
             echo '<a href="adminpanel.php?go=' . self::ROUTE_EDIT_ANIME . '&set_id=' . $id . '&delete">Удалить</a>';
             echo '</form>';
         }
@@ -356,7 +360,7 @@ class Router extends Main {
             echo '<form action="adminpanel.php?go=' . self::ROUTE_EDIT_MANGA . '&set_id=' . $id . '" method="post">';
             echo 'Название манги (англ.): <input type="text" required name="manga_name" id="name" value="' . $manga[MangaDataAdapter::COL_NAME] . '" /><br>';
             echo 'Папка манги: <input type="text" name="folder" id="folder" value="' . $manga[MangaDataAdapter::COL_FOLDER] . '" /><br>';
-            echo '<input type="submit" value="Submit"><br>';
+            echo '<input type="submit" value="Submit"><hr>';
             echo '<a href="adminpanel.php?go=' . self::ROUTE_EDIT_MANGA . '&set_id=' . $id . '&delete">Удалить</a>';
             echo '</form>';
         }
@@ -435,7 +439,7 @@ class Router extends Main {
                     echo 'ID видео для субтитров: <input type="text" name="sub_video_id" id="sub_video_id" /><br>';
                     echo 'Субтитры: <input type="file" name="sub_file" id="sub_file" ><hr>';
                     echo 'ID видео для озвучки: <input type="text" name="dub_video_id" id="dub_video_id" /><br>';
-                    echo 'Субтитры для озвучки: <input type="file" name="dub_sub_file" id="dub_sub_file" >';
+                    echo 'Субтитры для озвучки: <input type="file" name="dub_sub_file" id="dub_sub_file" ><hr>';
                     echo '<input type="submit" value="Submit"><br>';
                     echo '</form>';
                 }
@@ -447,6 +451,9 @@ class Router extends Main {
                 echo '<br><h3>';
                 echo '<p class="text-center">';
                 echo $anime[UserEnum::COL_NAME] . '<br>';
+                if (count($episodes) >  6) {
+                    echo '<a href="adminpanel.php?go=' . self::ROUTE_UPLOAD_EPISODE . '&set_anime_id=' . $animeId . '&new_episode">Новая серия</a><br>';
+                }
                 foreach ($episodes as $episode) {
                     echo '<a href="adminpanel.php?go=' . self::ROUTE_UPLOAD_EPISODE . '&set_anime_id=' . $animeId . '&set_id=' . $episode[UserEnum::COL_ID] . '">'
                         . $episode[UserEnum::COL_NAME] . ' — ' . $episode[UserEnum::COL_ID] . '</a><br>';
@@ -498,9 +505,190 @@ class Router extends Main {
                 echo 'ID видео для субтитров: <input type="text" name="sub_video_id" id="sub_video_id" value="' . $episode[EpisodeDataAdapter::COL_SUB_VIDEO_ID] . '" /><br>';
                 echo 'Субтитры: <input type="file" name="sub_file" id="sub_file" ><hr>';
                 echo 'ID видео для озвучки: <input type="text" name="dub_video_id" id="dub_video_id" value="' . $episode[EpisodeDataAdapter::COL_DUB_VIDEO_ID] . '" /><br>';
-                echo 'Субтитры для озвучки: <input type="file" name="dub_sub_file" id="dub_sub_file" >';
-                echo '<input type="submit" value="Submit"><br>';
+                echo 'Субтитры для озвучки: <input type="file" name="dub_sub_file" id="dub_sub_file" ><hr>';
+                echo '<input type="submit" value="Submit"><hr>';
                 echo '<a href="adminpanel.php?go=' . self::ROUTE_UPLOAD_EPISODE . '&set_anime_id=' . $animeId . '&set_id=' . $episodeId . '&delete">Удалить</a>';
+                echo '</form>';
+            }
+        }
+    }
+    
+    protected function _printUploadChapterMenu() {
+        $adapter = $this->_currentUser->getAdapter()->getMangaAdapter();
+        $availManga = $this->_currentUser->getAvailManga();
+        
+        $mangaId = isset($_GET['set_manga_id']) ? intval($_GET['set_manga_id']) : 0;
+        if ($mangaId === 0) {
+            $mangas = $adapter->getAllMangas();
+            echo '<br><h3>';
+            echo '<p class="text-center">';
+            foreach ($mangas as $manga) {
+                if (in_array($manga[UserEnum::COL_ID], $availManga) || 
+                        $this->_currentUser->getRole() === UserEnum::ROLE_MEGA_ADMIN ||
+                        $this->_currentUser->getRole() === UserEnum::ROLE_ADMIN) {
+                    echo '<a href="adminpanel.php?go=' . self::ROUTE_UPLOAD_CHAPTER . '&set_manga_id=' . $manga['id'] . '">'
+                        . $manga[UserEnum::COL_ID] . ' — ' . $manga[UserEnum::COL_NAME] . '</a><br>';
+                }
+            }
+            echo '</p></h3>';
+        }
+        else {
+            if (!in_array($mangaId, $availManga) && 
+                    $this->_currentUser->getRole() !== UserEnum::ROLE_MEGA_ADMIN &&
+                    $this->_currentUser->getRole() !== UserEnum::ROLE_ADMIN) {
+                $this->_printError('You can\'t be here');
+                return;
+            }
+            
+            $manga = $adapter->getMangaById($mangaId);
+            $chapterId = isset($_GET['set_id']) ? intval($_GET['set_id']) : 0;
+            $chapterAdapter = $this->_currentUser->getAdapter()->getChapterAdapter();
+            if (isset($_GET['new_chapter'])) {
+                if (isset($_POST['name']) && isset($_POST['number'])) {
+                    $chapter = array();
+                    $chapter[ChapterDataAdapter::COL_NAME] = $_POST['name'];
+                    $chapter[ChapterDataAdapter::COL_NUMBER] = $_POST['number'];
+                    $chapter[ChapterDataAdapter::COL_CHAPTER_NAME] = $_POST['chapter_name'];
+                    $chapter[ChapterDataAdapter::COL_DOWNLOAD] = $_POST['download'];
+                    
+                    if (isset($_FILES['chapter_files'])) {
+                        $path = './manga/' . $manga[MangaDataAdapter::COL_FOLDER] . '/' . $chapter[ChapterDataAdapter::COL_NUMBER];
+                        if (!file_exists($path)) {
+                            mkdir($path, 0775, true);
+                            chmod($path, 0775);
+                        }
+
+                        foreach ($_FILES["chapter_files"]["error"] as $key => $error) {
+                            if ($error == UPLOAD_ERR_OK) {
+                                $tmp_name = $_FILES["chapter_files"]["tmp_name"][$key];
+                                $namep = basename($_FILES["chapter_files"]["name"][$key]);
+                                
+                                move_uploaded_file($tmp_name, $path . '/' . $namep);
+                            }
+                        }
+                        
+                        $pages = scandir($path . '/');
+                        $links = array();
+                        foreach ($pages as $val) {
+                            if (($val !== ".") && ($val !== "..")) 
+                                $links[] = '"http://risensteam.ru/manga/' . $manga[MangaDataAdapter::COL_FOLDER] . '/' . $chapter[ChapterDataAdapter::COL_NUMBER] . '/' . $val . '"';
+                        }
+                        $chapter[ChapterDataAdapter::COL_LINKS] = implode(',', $links);
+                    }
+                    else {
+                        $chapter[ChapterDataAdapter::COL_LINKS] = '';
+                    }
+                    
+                    $chapterId = $chapterAdapter->createNewChapter($chapter[ChapterDataAdapter::COL_NAME], $chapter[ChapterDataAdapter::COL_NUMBER], $mangaId,
+                            $chapter[ChapterDataAdapter::COL_CHAPTER_NAME], $chapter[ChapterDataAdapter::COL_LINKS],
+                            $chapter[ChapterDataAdapter::COL_DOWNLOAD]);
+                    if ($chapterId) {
+                        echo '<script>window.location.replace("?go=' . self::ROUTE_UPLOAD_CHAPTER . '&set_manga_id=' . $mangaId . '&set_id=' . $chapterId . '");</script>';
+                    }
+                    else {
+                        $this->_printError('Could not create chapter');
+                    }
+                }
+                else {
+                    echo '<br><a href="?go=' . self::ROUTE_UPLOAD_CHAPTER . '&set_manga_id=' . $mangaId . '">Назад</a>';
+                    echo '<form action="adminpanel.php?go=' . self::ROUTE_UPLOAD_CHAPTER . '&set_manga_id=' . $mangaId . '&new_chapter" method="post">';
+                    echo 'Название главы с номером: <input type="text" required name="name" id="name" value="Глава " /><br>';
+                    echo 'Порядковый номер главы (для списка): <input type="text" required name="number" id="number" /><br>';
+                    echo 'Название главы: <input type="text" name="chapter_name" id="chapter_name" /><hr>';
+                    echo '<input type="file" name="chapter_files" id="chapter_files" ><br>';
+                    echo 'Очистить папку <input type="checkbox" name="clear" id="clear"><hr>';
+                    echo 'Ссылка на скачку: <input type="text" name="download" id="download" /><hr>';
+                    echo '<input type="submit" value="Submit"><hr>';
+                    echo '</form>';
+                }
+            }
+            elseif ($chapterId === 0) {
+                echo '<br><a href="?go=' . self::ROUTE_UPLOAD_CHAPTER . '">Назад</a>';
+                $chapters = $chapterAdapter->getChaptersByMangaId($mangaId);
+
+                echo '<br><h3>';
+                echo '<p class="text-center">';
+                echo $manga[UserEnum::COL_NAME] . '<br>';
+                if (count($chapters) >  6) {
+                    echo '<a href="adminpanel.php?go=' . self::ROUTE_UPLOAD_CHAPTER . '&set_manga_id=' . $mangaId . '&new_chapter">Новая глава</a><br>';
+                }
+                foreach ($chapters as $chapter) {
+                    echo '<a href="adminpanel.php?go=' . self::ROUTE_UPLOAD_CHAPTER . '&set_manga_id=' . $mangaId . '&set_id=' . $chapter[UserEnum::COL_ID] . '">'
+                        . $chapter[UserEnum::COL_NAME] . ' — ' . $chapter[UserEnum::COL_ID] . '</a><br>';
+                }
+                echo '<a href="adminpanel.php?go=' . self::ROUTE_UPLOAD_CHAPTER . '&set_manga_id=' . $mangaId . '&new_chapter">Новая глава</a><br>';
+                echo '</p></h3>';
+            }
+            else {
+                echo '<br><a href="?go=' . self::ROUTE_UPLOAD_CHAPTER . '&set_manga_id=' . $mangaId . '">Назад</a>';
+                $chapter = $chapterAdapter->getChapterById($chapterId);
+                if ($chapter[ChapterDataAdapter::COL_MANGA_ID] !== $mangaId) {
+                    $this->_printError('You can\'t be here');
+                    return;
+                }
+                
+                if (isset($_POST['chapter_name']) && isset($_POST['number'])) {
+                    $chapter[ChapterDataAdapter::COL_NAME] = $_POST['name'];
+                    $chapter[ChapterDataAdapter::COL_NUMBER] = $_POST['number'];
+                    $chapter[ChapterDataAdapter::COL_CHAPTER_NAME] = $_POST['chapter_name'];
+                    $chapter[ChapterDataAdapter::COL_DOWNLOAD] = $_POST['download'];
+                    
+                    if (isset($_FILES['chapter_files'])) {
+                        $path = './manga/' . $manga[MangaDataAdapter::COL_FOLDER] . '/' . $chapter[ChapterDataAdapter::COL_NUMBER];
+                        if (!file_exists($path)) {
+                            mkdir($path, 0775, true);
+                            chmod($path, 0775);
+                        }
+                        
+                        if ($_POST['clear'] == true) {
+                            foreach (glob($path . '/*') as $file) {
+                                unlink($file);
+                            }
+                        }
+
+                        foreach ($_FILES["chapter_files"]["error"] as $key => $error) {
+                            if ($error == UPLOAD_ERR_OK) {
+                                $tmp_name = $_FILES["chapter_files"]["tmp_name"][$key];
+                                $namep = basename($_FILES["chapter_files"]["name"][$key]);
+                                
+                                move_uploaded_file($tmp_name, $path . '/' . $namep);
+                            }
+                        }
+                        
+                        $pages = scandir($path . '/');
+                        $links = array();
+                        foreach ($pages as $val) {
+                            if (($val !== ".") && ($val !== "..")) 
+                                $links[] = '"http://risensteam.ru/manga/' . $manga[MangaDataAdapter::COL_FOLDER] . '/' . $chapter[ChapterDataAdapter::COL_NUMBER] . '/' . $val . '"';
+                        }
+                        $chapter[ChapterDataAdapter::COL_LINKS] = implode(',', $links);
+                    }
+                    else {
+                        $chapter[ChapterDataAdapter::COL_LINKS] = '';
+                    }
+                    
+                    $chapterAdapter->updateChapter($chapterId, $chapter[ChapterDataAdapter::COL_NAME], $chapter[ChapterDataAdapter::COL_NUMBER],
+                            $chapter[ChapterDataAdapter::COL_CHAPTER_NAME], $chapter[ChapterDataAdapter::COL_LINKS],
+                            $chapter[ChapterDataAdapter::COL_DOWNLOAD]);
+                }
+                elseif (isset($_GET['delete'])) {
+                    if ($chapterAdapter->removeChapter($chapterId)) {
+                        echo '<script>window.location.replace("?go=' . self::ROUTE_UPLOAD_CHAPTER . '&set_manga_id=' . $mangaId . '");</script>';
+                    }
+                    else {
+                        $this->_printError('Не удалось удалить');
+                    }
+                }
+                
+                echo '<form action="adminpanel.php?go=' . self::ROUTE_UPLOAD_CHAPTER . '&set_manga_id=' . $mangaId . '&set_id=' . $chapterId . '" method="post">';
+                echo 'Название главы с номером: <input type="text" required name="name" id="name" value="' . $chapter[ChapterDataAdapter::COL_NAME] . '" /><br>';
+                echo 'Порядковый номер главы (для списка): <input type="text" required name="number" id="number" value="' . $chapter[ChapterDataAdapter::COL_NUMBER] . '" /><br>';
+                echo 'Название главы: <input type="text" name="chapter_name" id="chapter_name" value="' . $chapter[ChapterDataAdapter::COL_CHAPTER_NAME] . '" /><hr>';
+                echo '<input type="file" name="chapter_files" id="chapter_files" ><br>';
+                echo 'Очистить папку <input type="checkbox" name="clear" id="clear"><hr>';
+                echo 'Ссылка на скачку: <input type="text" name="download" id="download" value="' . $chapter[ChapterDataAdapter::COL_DOWNLOAD] . '" /><hr>';
+                echo '<input type="submit" value="Submit"><hr>';
+                echo '<a href="adminpanel.php?go=' . self::ROUTE_UPLOAD_CHAPTER . '&set_manga_id=' . $mangaId . '&set_id=' . $chapterId . '&delete">Удалить</a>';
                 echo '</form>';
             }
         }

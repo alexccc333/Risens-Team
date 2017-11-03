@@ -120,4 +120,8 @@ class UserDataAdapter extends DataAdapter {
     public function getEpisodeAdapter() {
         return new EpisodeDataAdapter($this->_mysqli);
     }
+    
+    public function getChapterAdapter() {
+        return new ChapterDataAdapter($this->_mysqli);
+    }
 }
