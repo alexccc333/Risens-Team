@@ -16,7 +16,7 @@ class LoggerDataAdapter extends DataAdapter {
     }
     
     public function getLogs($page) {
-        $sql = $this->_mysqli->prepare('SELECT * FROM admin_log LIMIT ?,' . self::PAGE_OFFSET);
+        $sql = $this->_mysqli->prepare('SELECT * FROM admin_log ORDER BY id DESC LIMIT ?,' . self::PAGE_OFFSET);
         $page = $page * self::PAGE_OFFSET;
         $sql->bind_param('i', $page);
         
