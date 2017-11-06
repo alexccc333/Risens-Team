@@ -53,7 +53,12 @@ class MangaDataAdapter extends DataAdapter {
         $sql->bind_param('ss', $name, $folder);
         $status = $sql->execute();
         
-        return $status;
+        if ($status) {
+            return $sql->insert_id;
+        }
+        else {
+            return false;
+        }
     }
     
     public function removeManga($id) {

@@ -49,7 +49,12 @@ class UserDataAdapter extends DataAdapter {
         $sql->bind_param('ssiss', $login, $passHash, $role, $availAnime, $availManga);
         $status = $sql->execute();
         
-        return $status;
+        if ($status) {
+            return $sql->insert_id;
+        }
+        else {
+            return false;
+        }
     }
 
     public function deactivateUser($id) {
@@ -107,6 +112,20 @@ class UserDataAdapter extends DataAdapter {
             
 			return $returnArray;
         }
+    }
+    
+    public function getIdByLogin($login) {
+        $sql = $this->_mysqli->prepare('SELECT id FROM users WHERE `name` =?');
+        $sql->bind_param('s', $login);
+        $status = $sql->execute();
+		
+		if (!$status) {
+			return 0;
+		}
+        $result = $sql->get_result();
+		$row = $result->fetch_assoc();
+        
+		return $row['id'];
     }
     
     public function getAnimeAdapter() {

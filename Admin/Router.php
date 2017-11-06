@@ -17,6 +17,7 @@ class Router extends Main {
     const ROUTE_UPLOAD_CHAPTER = 'uploadchapter';
     const ROUTE_EDIT_USER_PRIVILEGES = 'edituserprivileges';
     const ROUTE_CREATE_NEW_USER = 'createnewuser';
+    const ROUTE_SHOW_LOGS = 'showlogs';
     
     public function setUser($user) {
         $this->_currentUser = $user;
@@ -68,6 +69,9 @@ class Router extends Main {
                 case self::ROUTE_EDIT_USER_PRIVILEGES:
                     $this->_printEditUserMenu();
                     break;
+                case self::ROUTE_SHOW_LOGS:
+                    $this->_showLogs();
+                    break;
                 case self::ROUTE_CREATE_ANIME:
                     $this->_printNewAnimeMenu();
                     break;
@@ -101,6 +105,7 @@ class Router extends Main {
         switch ($route) {
             case self::ROUTE_CREATE_NEW_USER:
             case self::ROUTE_EDIT_USER_PRIVILEGES:
+            case self::ROUTE_SHOW_LOGS:
                 if ($role !== UserEnum::ROLE_MEGA_ADMIN) {
                     return false;
                 }
@@ -130,6 +135,7 @@ class Router extends Main {
             case UserEnum::ROLE_MEGA_ADMIN:
                 echo '<a href="?go=' . self::ROUTE_CREATE_NEW_USER . '">Создание нового пользователя</a><br>';
                 echo '<a href="?go=' . self::ROUTE_EDIT_USER_PRIVILEGES . '">Редактировать привилегии пользователей</a><br>';
+                echo '<a href="?go=' . self::ROUTE_SHOW_LOGS . '">Посмотреть логи</a><br>';
                 echo '</p><hr>';
             case UserEnum::ROLE_ADMIN:
                 echo '<p class="text-center">';
@@ -155,14 +161,25 @@ class Router extends Main {
             $password = hash('sha512', $_POST['new_password'] . SALT);
             $availAnime = isset($_POST['availAnime']) ? $_POST['availAnime'] : '';
             $availManga = isset($_POST['availManga']) ? $_POST['availManga'] : '';
-            $status = $adapter->createNewUser($_POST['new_login'], $password, $_POST['role'], $availAnime, $availManga);
+            $id = $adapter->createNewUser($_POST['new_login'], $password, $_POST['role'], $availAnime, $availManga);
             
-            if ($status) {
+            $logArray = array(
+                        Logger::IP => $this->_getCurrentUserIp(),
+                        Logger::ACTION => Logger::ACTION_USER_CREATE,
+                        Logger::SUBJECT_ID => $id,
+                );
+            
+            if ($id) {
+                $logArray[Logger::STATUS] = Logger::STATUS_OK;
                 echo '<h3><p class="text-center">User created</p></h3>';
             }
             else {
+                $logArray[Logger::STATUS] = Logger::STATUS_FAIL;
                 echo '<h3><p class="text-center">Could not create user</p></h3>';
             }
+            
+            $userId = $this->_currentUser->getId();
+            Logger::getInstance()->log($userId, $logArray);
         }
         else {
             echo '<form action="adminpanel.php?go=' . self::ROUTE_CREATE_NEW_USER . '" method="post">';
@@ -193,6 +210,8 @@ class Router extends Main {
         else {
             $user = $adapter->getDataForUser($id);
             if (isset($_POST['new_login']) && isset($_POST['new_password']) && isset($_POST['role'])) {
+                $contentBefore = $user;
+                
                 $user[UserEnum::COL_NAME] = $_POST['new_login'];
                 if ($_POST['new_password'] !== '') {
                     $user[UserEnum::COL_PASSWORD] = hash('sha512', $_POST['new_password'] . SALT);
@@ -205,11 +224,31 @@ class Router extends Main {
                     $user[UserEnum::COL_AVAIL_MANGA] = $this->_clearNewIdList($_POST['availManga']);
                 }
                 
-                $adapter->updateUser($id, $user[UserEnum::COL_NAME],  $user[UserEnum::COL_PASSWORD], $user[UserEnum::COL_ROLE], $user[UserEnum::COL_AVAIL_ANIME], $user[UserEnum::COL_AVAIL_MANGA]);
+                $logArray = array(
+                        Logger::IP => $this->_getCurrentUserIp(),
+                        Logger::ACTION => Logger::ACTION_USER_EDIT,
+                        Logger::STATUS => Logger::STATUS_OK,
+                        Logger::SUBJECT_ID => $id,
+                        Logger::CONTENT_BEFORE => $contentBefore,
+                        Logger::CONTENT_AFTER => $user,
+                );
+                $userId = $this->_currentUser->getId();
+                Logger::getInstance()->log($userId, $logArray);
+                
+                $adapter->updateUser($id, $user[UserEnum::COL_NAME],  $user[UserEnum::COL_PASSWORD], $user[UserEnum::COL_ROLE], $user[UserEnum::COL_AVAIL_ANIME], $user[UserEnum::COL_AVAIL_MANGA], $user[UserEnum::COL_COOKIE]);
             }
             elseif (isset($_GET['delete_user'])) {
                 if ($user[UserEnum::COL_ROLE] !== UserEnum::ROLE_MEGA_ADMIN) {
                     if ($adapter->deactivateUser($id)) {
+                        $logArray = array(
+                                Logger::IP => $this->_getCurrentUserIp(),
+                                Logger::ACTION => Logger::ACTION_USER_DEACTIVATE,
+                                Logger::STATUS => Logger::STATUS_OK,
+                                Logger::SUBJECT_ID => $id,
+                        );
+                        $userId = $this->_currentUser->getId();
+                        Logger::getInstance()->log($userId, $logArray);
+                        
                         $user[UserEnum::COL_ACTIVE] = 0;
                         echo '<br>Пользователь успешно отключен';
                     }
@@ -217,6 +256,15 @@ class Router extends Main {
             }
             elseif (isset($_GET['activate_user'])) {
                 if ($adapter->activateUser($id)) {
+                    $logArray = array(
+                            Logger::IP => $this->_getCurrentUserIp(),
+                            Logger::ACTION => Logger::ACTION_USER_ACTIVATE,
+                            Logger::STATUS => Logger::STATUS_OK,
+                            Logger::SUBJECT_ID => $id,
+                    );
+                    $userId = $this->_currentUser->getId();
+                    Logger::getInstance()->log($userId, $logArray);
+                    
                     $user[UserEnum::COL_ACTIVE] = 1;
                     echo '<br>Пользователь успешно восстановлен';
                 }
@@ -244,14 +292,25 @@ class Router extends Main {
         $adapter = $this->_currentUser->getAdapter()->getAnimeAdapter();
         
         if (isset($_POST['anime_name'])) {
-            $status = $adapter->createNewAnime($_POST['anime_name'], $_POST['banner_url']);
+            $animeId = $adapter->createNewAnime($_POST['anime_name'], $_POST['banner_url']);
             
-            if ($status) {
+            $logArray = array(
+                        Logger::IP => $this->_getCurrentUserIp(),
+                        Logger::ACTION => Logger::ACTION_ANIME_CREATE,
+                        Logger::SUBJECT_ID => $animeId,
+                );
+            
+            if ($animeId) {
+                $logArray[Logger::STATUS] = Logger::STATUS_OK;
                 echo '<h3><p class="text-center">Anime created</p></h3>';
             }
             else {
+                $logArray[Logger::STATUS] = Logger::STATUS_FAIL;
                 echo '<h3><p class="text-center">Could not create anime</p></h3>';
             }
+                
+            $userId = $this->_currentUser->getId();
+            Logger::getInstance()->log($userId, $logArray);
         }
         
         echo '<form action="adminpanel.php?go=' . self::ROUTE_CREATE_ANIME . '" method="post">';
@@ -279,18 +338,41 @@ class Router extends Main {
             $anime = $adapter->getAnimeById($id);
             
             if (isset($_POST['anime_name'])) {
+                $contentBefore = $anime;
                 $anime[AnimeDataAdapter::COL_NAME] = $_POST['anime_name'];
                 $anime[AnimeDataAdapter::COL_BANNER] = $_POST['banner_url'];
+                
+                $logArray = array(
+                        Logger::IP => $this->_getCurrentUserIp(),
+                        Logger::ACTION => Logger::ACTION_ANIME_EDIT,
+                        Logger::STATUS => Logger::STATUS_OK,
+                        Logger::SUBJECT_ID => $id,
+                        Logger::CONTENT_BEFORE => $contentBefore,
+                        Logger::CONTENT_AFTER => $anime,
+                );
+                $userId = $this->_currentUser->getId();
+                Logger::getInstance()->log($userId, $logArray);
                 
                 $adapter->updateAnime($id, $anime[AnimeDataAdapter::COL_NAME], $anime[AnimeDataAdapter::COL_BANNER]);
             }
             elseif (isset($_GET['delete'])) {
+                $logArray = array(
+                        Logger::IP => $this->_getCurrentUserIp(),
+                        Logger::ACTION => Logger::ACTION_ANIME_DELETE,
+                        Logger::SUBJECT_ID => $id,
+                );
+                
                 if ($adapter->removeAnime($id)) {
+                    $logArray[Logger::STATUS] = Logger::STATUS_OK;
                     echo '<script>window.location.replace("?go=' . self::ROUTE_EDIT_ANIME . '");</script>';
                 }
                 else {
+                    $logArray[Logger::STATUS] = Logger::STATUS_FAIL;
                     $this->_printError('Не удалось удалить');
                 }
+                
+                $userId = $this->_currentUser->getId();
+                Logger::getInstance()->log($userId, $logArray);
             }
             
             echo '<br><a href="?go=' . self::ROUTE_EDIT_ANIME . '">Назад</a>';
@@ -307,14 +389,25 @@ class Router extends Main {
         $adapter = $this->_currentUser->getAdapter()->getMangaAdapter();
         
         if (isset($_POST['manga_name'])) {
-            $status = $adapter->createNewManga($_POST['manga_name'], $_POST['folder']);
+            $mangaId = $adapter->createNewManga($_POST['manga_name'], $_POST['folder']);
             
-            if ($status) {
+            $logArray = array(
+                        Logger::IP => $this->_getCurrentUserIp(),
+                        Logger::ACTION => Logger::ACTION_MANGA_CREATE,
+                        Logger::SUBJECT_ID => $mangaId,
+                );
+            
+            if ($mangaId) {
+                $logArray[Logger::STATUS] = Logger::STATUS_OK;
                 echo '<h3><p class="text-center">Manga created</p></h3>';
             }
             else {
+                $logArray[Logger::STATUS] = Logger::STATUS_FAIL;
                 echo '<h3><p class="text-center">Could not create manga</p></h3>';
             }
+            
+            $id = $this->_currentUser->getId();
+            Logger::getInstance()->log($id, $logArray);
         }
         
         echo '<form action="adminpanel.php?go=' . self::ROUTE_CREATE_MANGA . '" method="post">';
@@ -342,18 +435,42 @@ class Router extends Main {
             $manga = $adapter->getMangaById($id);
             
             if (isset($_POST['manga_name'])) {
+                $contentBefore = $manga;
                 $manga[MangaDataAdapter::COL_NAME] = $_POST['manga_name'];
                 $manga[MangaDataAdapter::COL_FOLDER] = $_POST['folder'];
                 
                 $adapter->updateManga($id, $manga[MangaDataAdapter::COL_NAME], $manga[MangaDataAdapter::COL_FOLDER]);
+                
+                $logArray = array(
+                        Logger::IP => $this->_getCurrentUserIp(),
+                        Logger::ACTION => Logger::ACTION_MANGA_EDIT,
+                        Logger::STATUS => Logger::STATUS_OK,
+                        Logger::SUBJECT_ID => $id,
+                        Logger::CONTENT_BEFORE => $contentBefore,
+                        Logger::CONTENT_AFTER => $manga,
+                );
+                
+                $userId = $this->_currentUser->getId();
+                Logger::getInstance()->log($userId, $logArray);
             }
             elseif (isset($_GET['delete'])) {
+                $logArray = array(
+                        Logger::IP => $this->_getCurrentUserIp(),
+                        Logger::ACTION => Logger::ACTION_MANGA_DELETE,
+                        Logger::SUBJECT_ID => $id,
+                );
+                
                 if ($adapter->removeManga($id)) {
+                    $logArray[Logger::STATUS] = Logger::STATUS_OK;
                     echo '<script>window.location.replace("?go=' . self::ROUTE_EDIT_MANGA . '");</script>';
                 }
                 else {
+                    $logArray[Logger::STATUS] = Logger::STATUS_FAIL;
                     $this->_printError('Не удалось удалить');
                 }
+                
+                $userId = $this->_currentUser->getId();
+                Logger::getInstance()->log($userId, $logArray);
             }
             
             echo '<br><a href="?go=' . self::ROUTE_EDIT_MANGA . '">Назад</a>';
@@ -424,12 +541,24 @@ class Router extends Main {
                     $episodeId = $episodeAdapter->createNewEpisode($episode[EpisodeDataAdapter::COL_NAME], $episode[EpisodeDataAdapter::COL_NUMBER], $animeId,
                             $episode[EpisodeDataAdapter::COL_SUB_VIDEO_ID], $episode[EpisodeDataAdapter::COL_SUB_PATH],
                             $episode[EpisodeDataAdapter::COL_DUB_VIDEO_ID], $episode[EpisodeDataAdapter::COL_DUB_SUB_PATH]);
+                    
+                    $logArray = array(
+                                Logger::IP => $this->_getCurrentUserIp(),
+                                Logger::ACTION => Logger::ACTION_EPISODE_UPLOAD,
+                                Logger::SUBJECT_ID => $episodeId,
+                        );
+                    
                     if ($episodeId) {
+                        $logArray[Logger::STATUS] = Logger::STATUS_OK;
                         echo '<script>window.location.replace("?go=' . self::ROUTE_UPLOAD_EPISODE . '&set_anime_id=' . $animeId . '&set_id=' . $episodeId . '");</script>';
                     }
                     else {
+                        $logArray[Logger::STATUS] = Logger::STATUS_FAIL;
                         $this->_printError('Could not create episode');
                     }
+                    
+                    $id = $this->_currentUser->getId();
+                    Logger::getInstance()->log($id, $logArray);
                 }
                 else {
                     echo '<br><a href="?go=' . self::ROUTE_UPLOAD_EPISODE . '&set_anime_id=' . $animeId . '">Назад</a>';
@@ -470,6 +599,7 @@ class Router extends Main {
                 }
                 
                 if (isset($_POST['episode_name']) && isset($_POST['episode_number'])) {
+                    $contentBefore = $episode;
                     $episode[EpisodeDataAdapter::COL_NAME] = $_POST['episode_name'];
                     $episode[EpisodeDataAdapter::COL_NUMBER] = $_POST['episode_number'];
                     $episode[EpisodeDataAdapter::COL_SUB_VIDEO_ID] = $_POST['sub_video_id'];
@@ -489,14 +619,36 @@ class Router extends Main {
                     $episodeAdapter->updateEpisode($episodeId, $episode[EpisodeDataAdapter::COL_NAME], $episode[EpisodeDataAdapter::COL_NUMBER],
                             $episode[EpisodeDataAdapter::COL_SUB_VIDEO_ID], $episode[EpisodeDataAdapter::COL_SUB_PATH],
                             $episode[EpisodeDataAdapter::COL_DUB_VIDEO_ID], $episode[EpisodeDataAdapter::COL_DUB_SUB_PATH]);
+                    
+                    $logArray = array(
+                                Logger::IP => $this->_getCurrentUserIp(),
+                                Logger::ACTION => Logger::ACTION_EPISODE_UPDATE,
+                                Logger::STATUS => Logger::STATUS_OK,
+                                Logger::SUBJECT_ID => $episodeId,
+                                Logger::CONTENT_BEFORE => $contentBefore,
+                                Logger::CONTENT_AFTER => $episode,
+                        );
+                    $id = $this->_currentUser->getId();
+                    Logger::getInstance()->log($id, $logArray);
                 }
                 elseif (isset($_GET['delete'])) {
+                    $logArray = array(
+                                Logger::IP => $this->_getCurrentUserIp(),
+                                Logger::ACTION => Logger::ACTION_EPISODE_DELETE,
+                                Logger::SUBJECT_ID => $episodeId,
+                        );
+                    
                     if ($episodeAdapter->removeEpisode($episodeId)) {
+                        $logArray[Logger::STATUS] = Logger::STATUS_OK;
                         echo '<script>window.location.replace("?go=' . self::ROUTE_UPLOAD_EPISODE . '&set_anime_id=' . $animeId . '");</script>';
                     }
                     else {
+                        $logArray[Logger::STATUS] = Logger::STATUS_FAIL;
                         $this->_printError('Не удалось удалить');
                     }
+                    
+                    $id = $this->_currentUser->getId();
+                    Logger::getInstance()->log($id, $logArray);
                 }
                 
                 echo '<form action="adminpanel.php?go=' . self::ROUTE_UPLOAD_EPISODE . '&set_anime_id=' . $animeId . '&set_id=' . $episodeId . '" method="post">';
@@ -582,12 +734,24 @@ class Router extends Main {
                     $chapterId = $chapterAdapter->createNewChapter($chapter[ChapterDataAdapter::COL_NAME], $chapter[ChapterDataAdapter::COL_NUMBER], $mangaId,
                             $chapter[ChapterDataAdapter::COL_CHAPTER_NAME], $chapter[ChapterDataAdapter::COL_LINKS],
                             $chapter[ChapterDataAdapter::COL_DOWNLOAD]);
+                    
+                    $logArray = array(
+                                Logger::IP => $this->_getCurrentUserIp(),
+                                Logger::ACTION => Logger::ACTION_CHAPTER_UPLOAD,
+                                Logger::SUBJECT_ID => $chapterId,
+                        );
+                    
                     if ($chapterId) {
+                        $logArray[Logger::STATUS] = Logger::STATUS_OK;
                         echo '<script>window.location.replace("?go=' . self::ROUTE_UPLOAD_CHAPTER . '&set_manga_id=' . $mangaId . '&set_id=' . $chapterId . '");</script>';
                     }
                     else {
+                        $logArray[Logger::STATUS] = Logger::STATUS_FAIL;
                         $this->_printError('Could not create chapter');
                     }
+                    
+                    $id = $this->_currentUser->getId();
+                    Logger::getInstance()->log($id, $logArray);
                 }
                 else {
                     echo '<br><a href="?go=' . self::ROUTE_UPLOAD_CHAPTER . '&set_manga_id=' . $mangaId . '">Назад</a>';
@@ -628,6 +792,7 @@ class Router extends Main {
                 }
                 
                 if (isset($_POST['chapter_name']) && isset($_POST['number'])) {
+                    $contentBefore = $chapter;
                     $chapter[ChapterDataAdapter::COL_NAME] = $_POST['name'];
                     $chapter[ChapterDataAdapter::COL_NUMBER] = $_POST['number'];
                     $chapter[ChapterDataAdapter::COL_CHAPTER_NAME] = $_POST['chapter_name'];
@@ -670,14 +835,36 @@ class Router extends Main {
                     $chapterAdapter->updateChapter($chapterId, $chapter[ChapterDataAdapter::COL_NAME], $chapter[ChapterDataAdapter::COL_NUMBER],
                             $chapter[ChapterDataAdapter::COL_CHAPTER_NAME], $chapter[ChapterDataAdapter::COL_LINKS],
                             $chapter[ChapterDataAdapter::COL_DOWNLOAD]);
+                    
+                    $logArray = array(
+                                Logger::IP => $this->_getCurrentUserIp(),
+                                Logger::ACTION => Logger::ACTION_CHAPTER_UPDATE,
+                                Logger::STATUS => Logger::STATUS_OK,
+                                Logger::SUBJECT_ID => $chapterId,
+                                Logger::CONTENT_BEFORE => $contentBefore,
+                                Logger::CONTENT_AFTER => $chapter,
+                        );
+                    $id = $this->_currentUser->getId();
+                    Logger::getInstance()->log($id, $logArray);
                 }
                 elseif (isset($_GET['delete'])) {
+                    $logArray = array(
+                                Logger::IP => $this->_getCurrentUserIp(),
+                                Logger::ACTION => Logger::ACTION_CHAPTER_DELETE,
+                                Logger::SUBJECT_ID => $chapterId,
+                        );
+                    
                     if ($chapterAdapter->removeChapter($chapterId)) {
+                        $logArray[Logger::STATUS] = Logger::STATUS_OK;
                         echo '<script>window.location.replace("?go=' . self::ROUTE_UPLOAD_CHAPTER . '&set_manga_id=' . $mangaId . '");</script>';
                     }
                     else {
+                        $logArray[Logger::STATUS] = Logger::STATUS_FAIL;
                         $this->_printError('Не удалось удалить');
                     }
+                    
+                    $id = $this->_currentUser->getId();
+                    Logger::getInstance()->log($id, $logArray);
                 }
                 
                 echo '<form action="adminpanel.php?go=' . self::ROUTE_UPLOAD_CHAPTER . '&set_manga_id=' . $mangaId . '&set_id=' . $chapterId . '" method="post">';
@@ -713,5 +900,29 @@ class Router extends Main {
         }
         
         return implode(',', $list);
+    }
+    
+    protected function _getCurrentUserIp() {
+        return $this->_currentUser->getIp();
+    }
+    
+    protected function _showLogs() {
+        $page = isset($_GET['page']) ? intval($_GET['page']) : 0;
+        $logs = Logger::getInstance()->getPage($page);
+        echo '<hr>';
+        
+        //TO DO PRINT LOGS
+        var_dump($logs);
+        
+        echo '<hr>| ';
+        $pageCount = Logger::getInstance()->getPageCount();
+        for ($i = 0; $i < $pageCount; $i++) {
+            if ($i !== $page) {
+                echo '<a href="adminpanel.php?go=' . self::ROUTE_SHOW_LOGS . '&page=' . $i . '">' . ($i + 1) . '</a> | ';
+            }
+            else {
+                echo ($i + 1) . ' | ';
+            }
+        }
     }
 }

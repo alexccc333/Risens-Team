@@ -1,11 +1,15 @@
 <?php
 
 include 'bd.php';
+include 'Admin/DataAdapter.php';
 include 'Admin/Router.php';
 include 'Admin/User.php';
 include 'Frame/Extension.php';
 include 'Admin/header.php';
+include 'Admin/LoggerDataAdapter.php';
+include 'Admin/Logger.php';
 
+Logger::getInstance()->setAdapter(new LoggerDataAdapter($mysqli));
 $currentUser = new User();
 $form = new Router();
 

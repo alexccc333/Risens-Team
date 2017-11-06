@@ -3,10 +3,12 @@ include 'Admin\UserDataAdapter.php';
 include 'Admin\UserRoles.php';
 
 class User {
+    protected $_ip = '';
 	protected $_id = 0;
 	protected $_role = 0;
 	protected $_name = '';
 	protected $_cookie = '';
+    protected $_login = '';
 
 
 	protected $_availableAnime = array();
@@ -22,10 +24,12 @@ class User {
 	
 	public function __construct() {
 		$this->_role = UserEnum::ROLE_ANON;
+        $this->_ip = $_SERVER['REMOTE_ADDR'];
 	}
 	
     public function login($login, $password, $mysqli) {
         $this->_adapter = new UserDataAdapter($mysqli);
+        $this->_login = $login;
         $status = $this->_tryLogin($login, $password);
         
         if ($status) {
@@ -39,8 +43,11 @@ class User {
             }
             $this->_isLogged = self::LOGGED_SUCCESS;
         }
+        else {
+            $this->_isLogged = self::LOGGED_FAILED;
+        }
         
-        $this->_isLogged = self::LOGGED_FAILED;
+        $this->_doLog();
     }
 
 
@@ -51,8 +58,9 @@ class User {
             $this->_fillUser($toFetch);
             $this->_isLogged = self::LOGGED_SUCCESS;
         }
-        
-        $this->_isLogged = self::LOGGED_FAILED;
+        else {
+            $this->_isLogged = self::LOGGED_FAILED;
+        }
 	}
 	
 	protected function _tryLogin($login, $password) {
@@ -92,11 +100,29 @@ class User {
         return $this->_name;
     }
     
+    public function getId() {
+        return $this->_id;
+    }
+
     public function getAvailAnime() {
         return $this->_availableAnime;
     }
     
     public function getAvailManga() {
         return $this->_availableManga;
+    }
+    
+    protected function _doLog() {
+        $logArray = array(
+                    Logger::IP => $this->_ip,
+                    Logger::ACTION => Logger::ACTION_LOGIN,
+                    Logger::STATUS => $this->_isLogged === User::LOGGED_SUCCESS ? Logger::STATUS_OK : Logger::STATUS_FAIL,
+            );
+        $id = $this->_id !== NULL ? $this->_id : $this->_adapter->getIdByLogin($this->_login);
+        Logger::getInstance()->log($id, $logArray);
+    }
+    
+    public function getIp() {
+        return $this->_ip;
     }
 }

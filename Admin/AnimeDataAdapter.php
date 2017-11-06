@@ -1,6 +1,4 @@
 <?php
-include 'Admin\DataAdapter.php';
-
 class AnimeDataAdapter extends DataAdapter {
     const COL_ID = 'id';
     const COL_NAME = 'name';
@@ -54,7 +52,12 @@ class AnimeDataAdapter extends DataAdapter {
         $sql->bind_param('ss', $name, $bannerUrl);
         $status = $sql->execute();
         
-        return $status;
+        if ($status) {
+            return $sql->insert_id;
+        }
+        else {
+            return false;
+        }
     }
     
     public function removeAnime($id) {
