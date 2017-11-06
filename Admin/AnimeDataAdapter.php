@@ -5,7 +5,7 @@ class AnimeDataAdapter extends DataAdapter {
     const COL_BANNER = 'poster';
     
     public function getAllAnimes() {
-        $sql = $this->_mysqli->prepare('SELECT id, name from anime');
+        $sql = $this->_mysqli->prepare('SELECT id, name from anime ORDER BY id DESC');
         $status = $sql->execute();
         
         if ($status) {

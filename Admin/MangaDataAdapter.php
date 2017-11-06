@@ -6,7 +6,7 @@ class MangaDataAdapter extends DataAdapter {
     const COL_FOLDER = 'folder';
     
     public function getAllMangas() {
-        $sql = $this->_mysqli->prepare('SELECT id, name from manga');
+        $sql = $this->_mysqli->prepare('SELECT id, name from manga ORDER BY id DESC');
         $status = $sql->execute();
         
         if ($status) {
