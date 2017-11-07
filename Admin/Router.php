@@ -909,12 +909,48 @@ class Router extends Main {
     protected function _showLogs() {
         $page = isset($_GET['page']) ? intval($_GET['page']) : 0;
         $logs = Logger::getInstance()->getPage($page);
-        echo '<hr>';
+        echo '<hr><table width="100%">';
+        echo '<tr><td>ID действия</td><td>ID пользователя</td><td>Время</td><td width="50%">Контент</td></tr>';
         
-        //TO DO PRINT LOGS
-        var_dump($logs);
+        foreach ($logs as $log) {
+            echo '<tr>';
+            
+            echo '<td>' . $log[LoggerDataAdapter::COL_ID] . '</td>';
+            echo '<td>' . $log[LoggerDataAdapter::COL_USER] . '</td>';
+            echo '<td>' . $log[LoggerDataAdapter::COL_DATE] . '</td>';
+            
+            $values = json_decode($log[LoggerDataAdapter::COL_VALUE]);
+            
+            echo '<td><table width="100%" border="1px"><tr>';
+            foreach ($values as $key => $val) {
+                echo '<td>' . $key . '</td>';
+            }
+            echo '</tr><tr>';
+            foreach ($values as $key => $val) {
+                if ($key !== Logger::CONTENT_BEFORE && $key !== Logger::CONTENT_AFTER) {
+                    echo '<td>' . $val . '</td>';
+                }
+                else {
+                    echo '<td><table width="100%" border="1px"><tr>';
+                    
+                    foreach ($val as $contentKey => $content) {
+                        echo '<td>' . $contentKey . '</td>';
+                    }
+                    echo '</tr><tr>';
+                    
+                    foreach ($val as $content) {
+                        echo '<td>' . $content . '</td>';
+                    }
+                    
+                    echo '</tr></table></td>';
+                }
+            }
+            echo '</tr></table></td>';
+            
+            echo '</tr>';
+        }
         
-        echo '<hr>| ';
+        echo '</table><hr>| ';
         $pageCount = Logger::getInstance()->getPageCount();
         for ($i = 0; $i < $pageCount; $i++) {
             if ($i !== $page) {

@@ -3,7 +3,7 @@ class LoggerDataAdapter extends DataAdapter {
     const COL_ID = 'id';
     const COL_DATE = 'date';
     const COL_VALUE = 'value';
-    const COL_USER = 'user';
+    const COL_USER = 'user_id';
     
     const PAGE_OFFSET = 30;
     
