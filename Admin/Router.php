@@ -520,23 +520,8 @@ class Router extends Main {
                     $episode[EpisodeDataAdapter::COL_NUMBER] = $_POST['episode_number'];
                     $episode[EpisodeDataAdapter::COL_SUB_VIDEO_ID] = $_POST['sub_video_id'];
                     $episode[EpisodeDataAdapter::COL_DUB_VIDEO_ID] = $_POST['dub_video_id'];
-                    
-                    if (isset($_FILES['sub_file']) && $_FILES['sub_file']['error'] == UPLOAD_ERR_OK) {
-                        $tmp_name = $_FILES['sub_file']['tmp_name'];
-                        move_uploaded_file($tmp_name, './anime/sub_' . $episodeId . '.ass');
-                        $episode[EpisodeDataAdapter::COL_SUB_PATH] = 'http://risensteam.ru/anime/sub_' . $episodeId . '.ass';
-                    }
-                    else {
-                        $episode[EpisodeDataAdapter::COL_SUB_PATH] = '';
-                    }
-                    if (isset($_FILES['dub_sub_file']) && $_FILES['dub_sub_file']['error'] == UPLOAD_ERR_OK) {
-                        $tmp_name = $_FILES['dub_sub_file']['tmp_name'];
-                        move_uploaded_file($tmp_name, './anime/dub_' . $episodeId . '.ass');
-                        $episode[EpisodeDataAdapter::COL_DUB_SUB_PATH] = 'http://risensteam.ru/anime/dub_' . $episodeId . '.ass';
-                    }
-                    else {
-                        $episode[EpisodeDataAdapter::COL_DUB_SUB_PATH] = '';
-                    }
+                    $episode[EpisodeDataAdapter::COL_SUB_PATH] = '';
+                    $episode[EpisodeDataAdapter::COL_DUB_SUB_PATH] = '';
                     
                     $episodeId = $episodeAdapter->createNewEpisode($episode[EpisodeDataAdapter::COL_NAME], $episode[EpisodeDataAdapter::COL_NUMBER], $animeId,
                             $episode[EpisodeDataAdapter::COL_SUB_VIDEO_ID], $episode[EpisodeDataAdapter::COL_SUB_PATH],
@@ -549,6 +534,21 @@ class Router extends Main {
                         );
                     
                     if ($episodeId) {
+                        if (isset($_FILES['sub_file']) && $_FILES['sub_file']['error'] == UPLOAD_ERR_OK) {
+                            $tmp_name = $_FILES['sub_file']['tmp_name'];
+                            move_uploaded_file($tmp_name, './anime/sub_' . $episodeId . '.ass');
+                            $episode[EpisodeDataAdapter::COL_SUB_PATH] = 'http://risensteam.ru/anime/sub_' . $episodeId . '.ass';
+                        }
+                        
+                        if (isset($_FILES['dub_sub_file']) && $_FILES['dub_sub_file']['error'] == UPLOAD_ERR_OK) {
+                            $tmp_name = $_FILES['dub_sub_file']['tmp_name'];
+                            move_uploaded_file($tmp_name, './anime/dub_' . $episodeId . '.ass');
+                            $episode[EpisodeDataAdapter::COL_DUB_SUB_PATH] = 'http://risensteam.ru/anime/dub_' . $episodeId . '.ass';
+                        }
+                        $episodeAdapter->updateEpisode($episodeId, $episode[EpisodeDataAdapter::COL_NAME], $episode[EpisodeDataAdapter::COL_NUMBER],
+                            $episode[EpisodeDataAdapter::COL_SUB_VIDEO_ID], $episode[EpisodeDataAdapter::COL_SUB_PATH],
+                            $episode[EpisodeDataAdapter::COL_DUB_VIDEO_ID], $episode[EpisodeDataAdapter::COL_DUB_SUB_PATH]);
+                        
                         $logArray[Logger::STATUS] = Logger::STATUS_OK;
                         echo '<script>window.location.replace("?go=' . self::ROUTE_UPLOAD_EPISODE . '&set_anime_id=' . $animeId . '&set_id=' . $episodeId . '");</script>';
                     }
@@ -562,7 +562,7 @@ class Router extends Main {
                 }
                 else {
                     echo '<br><a href="?go=' . self::ROUTE_UPLOAD_EPISODE . '&set_anime_id=' . $animeId . '">Назад</a>';
-                    echo '<form action="adminpanel.php?go=' . self::ROUTE_UPLOAD_EPISODE . '&set_anime_id=' . $animeId . '&new_episode" method="post">';
+                    echo '<form enctype="multipart/form-data" action="adminpanel.php?go=' . self::ROUTE_UPLOAD_EPISODE . '&set_anime_id=' . $animeId . '&new_episode" method="post">';
                     echo 'Название эпизода: <input type="text" required name="episode_name" id="name" value="Серия " /><br>';
                     echo 'Порядковый номер (для списка): <input type="text" required name="episode_number" id="number" /><hr>';
                     echo 'ID видео для субтитров: <input type="text" name="sub_video_id" id="sub_video_id" /><br>';
@@ -651,7 +651,7 @@ class Router extends Main {
                     Logger::getInstance()->log($id, $logArray);
                 }
                 
-                echo '<form action="adminpanel.php?go=' . self::ROUTE_UPLOAD_EPISODE . '&set_anime_id=' . $animeId . '&set_id=' . $episodeId . '" method="post">';
+                echo '<form enctype="multipart/form-data" action="adminpanel.php?go=' . self::ROUTE_UPLOAD_EPISODE . '&set_anime_id=' . $animeId . '&set_id=' . $episodeId . '" method="post">';
                 echo 'Название эпизода: <input type="text" required name="episode_name" id="name" value="' . $episode[EpisodeDataAdapter::COL_NAME] . '" /><br>';
                 echo 'Порядковый номер (для списка): <input type="text" required name="episode_number" id="number" value="' . $episode[EpisodeDataAdapter::COL_NUMBER] . '" /><hr>';
                 echo 'ID видео для субтитров: <input type="text" name="sub_video_id" id="sub_video_id" value="' . $episode[EpisodeDataAdapter::COL_SUB_VIDEO_ID] . '" /><br>';
@@ -709,7 +709,7 @@ class Router extends Main {
                             mkdir($path, 0775, true);
                             chmod($path, 0775);
                         }
-
+                        
                         foreach ($_FILES["chapter_files"]["error"] as $key => $error) {
                             if ($error == UPLOAD_ERR_OK) {
                                 $tmp_name = $_FILES["chapter_files"]["tmp_name"][$key];
@@ -720,6 +720,7 @@ class Router extends Main {
                         }
                         
                         $pages = scandir($path . '/');
+                        
                         $links = array();
                         foreach ($pages as $val) {
                             if (($val !== ".") && ($val !== "..")) 
@@ -755,11 +756,11 @@ class Router extends Main {
                 }
                 else {
                     echo '<br><a href="?go=' . self::ROUTE_UPLOAD_CHAPTER . '&set_manga_id=' . $mangaId . '">Назад</a>';
-                    echo '<form action="adminpanel.php?go=' . self::ROUTE_UPLOAD_CHAPTER . '&set_manga_id=' . $mangaId . '&new_chapter" method="post">';
+                    echo '<form enctype="multipart/form-data" action="adminpanel.php?go=' . self::ROUTE_UPLOAD_CHAPTER . '&set_manga_id=' . $mangaId . '&new_chapter" method="post">';
                     echo 'Название главы с номером: <input type="text" required name="name" id="name" value="Глава " /><br>';
                     echo 'Порядковый номер главы (для списка): <input type="text" required name="number" id="number" /><br>';
                     echo 'Название главы: <input type="text" name="chapter_name" id="chapter_name" /><hr>';
-                    echo '<input type="file" name="chapter_files" id="chapter_files" ><br>';
+                    echo '<input type="file" name="chapter_files[]" id="chapter_files" multiple><br>';
                     echo 'Очистить папку <input type="checkbox" name="clear" id="clear"><hr>';
                     echo 'Ссылка на скачку: <input type="text" name="download" id="download" /><hr>';
                     echo '<input type="submit" value="Submit"><hr>';
@@ -821,6 +822,7 @@ class Router extends Main {
                         }
                         
                         $pages = scandir($path . '/');
+                        
                         $links = array();
                         foreach ($pages as $val) {
                             if (($val !== ".") && ($val !== "..")) 
@@ -867,11 +869,11 @@ class Router extends Main {
                     Logger::getInstance()->log($id, $logArray);
                 }
                 
-                echo '<form action="adminpanel.php?go=' . self::ROUTE_UPLOAD_CHAPTER . '&set_manga_id=' . $mangaId . '&set_id=' . $chapterId . '" method="post">';
+                echo '<form enctype="multipart/form-data" action="adminpanel.php?go=' . self::ROUTE_UPLOAD_CHAPTER . '&set_manga_id=' . $mangaId . '&set_id=' . $chapterId . '" method="post">';
                 echo 'Название главы с номером: <input type="text" required name="name" id="name" value="' . $chapter[ChapterDataAdapter::COL_NAME] . '" /><br>';
                 echo 'Порядковый номер главы (для списка): <input type="text" required name="number" id="number" value="' . $chapter[ChapterDataAdapter::COL_NUMBER] . '" /><br>';
                 echo 'Название главы: <input type="text" name="chapter_name" id="chapter_name" value="' . $chapter[ChapterDataAdapter::COL_CHAPTER_NAME] . '" /><hr>';
-                echo '<input type="file" name="chapter_files" id="chapter_files" ><br>';
+                echo '<input type="file" name="chapter_files[]" id="chapter_files" multiple><br>';
                 echo 'Очистить папку <input type="checkbox" name="clear" id="clear"><hr>';
                 echo 'Ссылка на скачку: <input type="text" name="download" id="download" value="' . $chapter[ChapterDataAdapter::COL_DOWNLOAD] . '" /><hr>';
                 echo '<input type="submit" value="Submit"><hr>';

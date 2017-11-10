@@ -1,6 +1,6 @@
 <?php
-include 'Admin\UserDataAdapter.php';
-include 'Admin\UserRoles.php';
+include 'UserDataAdapter.php';
+include 'UserRoles.php';
 
 class User {
     protected $_ip = '';

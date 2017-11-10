@@ -63,7 +63,7 @@ class ChapterDataAdapter extends DataAdapter {
     
     public function createNewChapter($name, $number, $mangaId, $chapterName, $links, $download) {
         $sql = $this->_mysqli->prepare('INSERT INTO `chapters`(`id`, `name`, `chapter`, `mangaid`, `chaptername`, `links`, `download`) VALUES(NULL,?,?,?,?,?,?)');
-        $sql->bind_param('ssisis', $name, $number, $mangaId, $chapterName, $links, $download);
+        $sql->bind_param('ssisss', $name, $number, $mangaId, $chapterName, $links, $download);
         $status = $sql->execute();
         
         if ($status) {

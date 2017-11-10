@@ -1,5 +1,5 @@
 <?php
-include 'Admin\Enum.php';
+include 'Enum.php';
 
 class UserEnum extends Enum {
 	const ROLE_ANON = 0;
