@@ -48,7 +48,7 @@ class EpisodeDataAdapter extends DataAdapter {
     
     public function updateEpisode($id, $name, $number, $subVideoId, $subPath, $dubVideoId, $dubPath) {
         $sql = $this->_mysqli->prepare('UPDATE `episodes` SET `name`=?,`number`=?,`subvideoid`=?,`subpath`=?,`dubvideoid`=?,`dubsubpath`=? WHERE `id`=?');
-        $sql->bind_param('ssisisi', $name, $number, $subVideoId, $subPath, $dubVideoId, $dubPath, $id);
+        $sql->bind_param('ssssssi', $name, $number, $subVideoId, $subPath, $dubVideoId, $dubPath, $id);
         $status = $sql->execute();
         
         return $status;
@@ -64,7 +64,7 @@ class EpisodeDataAdapter extends DataAdapter {
     
     public function createNewEpisode($name, $number, $animeId, $subVideoId, $subPath, $dubVideoId, $dubPath) {
         $sql = $this->_mysqli->prepare('INSERT INTO `episodes`(`id`, `name`, `number`, `anime_id`, `subvideoid`, `subpath`, `dubvideoid`, `dubsubpath`) VALUES(NULL,?,?,?,?,?,?,?)');
-        $sql->bind_param('ssiisis', $name, $number, $animeId, $subVideoId, $subPath, $dubVideoId, $dubPath);
+        $sql->bind_param('ssissss', $name, $number, $animeId, $subVideoId, $subPath, $dubVideoId, $dubPath);
         $status = $sql->execute();
         
         if ($status) {
