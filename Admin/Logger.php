@@ -62,4 +62,8 @@ class Logger {
     public function getPageCount() {
         return $this->_adapter->getRowsCount();
     }
+    
+    public function getUserNameById($id) {
+        return $this->_adapter->getUserNameById($id);
+    }
 }

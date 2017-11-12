@@ -48,4 +48,18 @@ class LoggerDataAdapter extends DataAdapter {
             return ceil($count / self::PAGE_OFFSET);
         }
     }
+    
+    public function getUserNameById($id) {
+        $sql = $this->_mysqli->prepare('SELECT name FROM users WHERE `id` =?');
+        $sql->bind_param('i', $id);
+        $status = $sql->execute();
+		
+        if (!$status) {
+			return 0;
+		}
+        $result = $sql->get_result();
+		$row = $result->fetch_assoc();
+        
+		return $row['name'];
+    }
 }

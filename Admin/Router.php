@@ -912,13 +912,15 @@ class Router extends Main {
         $page = isset($_GET['page']) ? intval($_GET['page']) : 0;
         $logs = Logger::getInstance()->getPage($page);
         echo '<hr><table width="100%">';
-        echo '<tr><td>ID действия</td><td>ID пользователя</td><td>Время</td><td width="50%">Контент</td></tr>';
+        echo '<tr><td>ID действия</td><td>Пользователь</td><td>Время</td><td width="50%">Контент</td></tr>';
         
         foreach ($logs as $log) {
             echo '<tr>';
             
+            $userName = Logger::getInstance()->getUserNameById($log[LoggerDataAdapter::COL_USER]);
+            
             echo '<td>' . $log[LoggerDataAdapter::COL_ID] . '</td>';
-            echo '<td>' . $log[LoggerDataAdapter::COL_USER] . '</td>';
+            echo '<td>' . $userName . '(' . $log[LoggerDataAdapter::COL_USER] . ')</td>';
             echo '<td>' . $log[LoggerDataAdapter::COL_DATE] . '</td>';
             
             $values = json_decode($log[LoggerDataAdapter::COL_VALUE]);
