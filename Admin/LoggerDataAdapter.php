@@ -55,11 +55,11 @@ class LoggerDataAdapter extends DataAdapter {
         $status = $sql->execute();
 		
         if (!$status) {
-			return 0;
-		}
+            return 0;
+        }
         $result = $sql->get_result();
-		$row = $result->fetch_assoc();
+        $row = $result->fetch_assoc();
         
-		return $row['name'];
+        return $rowp['name'];
     }
 }

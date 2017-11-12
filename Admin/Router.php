@@ -920,7 +920,7 @@ class Router extends Main {
             $userName = Logger::getInstance()->getUserNameById($log[LoggerDataAdapter::COL_USER]);
             
             echo '<td>' . $log[LoggerDataAdapter::COL_ID] . '</td>';
-            echo '<td>' . $userName . '(' . $log[LoggerDataAdapter::COL_USER] . ')</td>';
+            echo '<td>' . $userName . ' (' . $log[LoggerDataAdapter::COL_USER] . ')</td>';
             echo '<td>' . $log[LoggerDataAdapter::COL_DATE] . '</td>';
             
             $values = json_decode($log[LoggerDataAdapter::COL_VALUE]);
