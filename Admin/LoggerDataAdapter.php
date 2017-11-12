@@ -60,6 +60,6 @@ class LoggerDataAdapter extends DataAdapter {
         $result = $sql->get_result();
         $row = $result->fetch_assoc();
         
-        return $rowp['name'];
+        return $row['name'];
     }
 }
