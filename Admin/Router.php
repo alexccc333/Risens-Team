@@ -364,7 +364,10 @@ class Router extends Main {
                 
                 if ($adapter->removeAnime($id)) {
                     $logArray[Logger::STATUS] = Logger::STATUS_OK;
-                    echo '<script>window.location.replace("?go=' . self::ROUTE_EDIT_ANIME . '");</script>';
+                    echo '<script>';
+                    echo 'alert("Аниме удалено");';
+                    echo 'window.location.replace("?go=' . self::ROUTE_EDIT_ANIME . '");';
+                    echo '</script>';
                 }
                 else {
                     $logArray[Logger::STATUS] = Logger::STATUS_FAIL;
@@ -462,7 +465,10 @@ class Router extends Main {
                 
                 if ($adapter->removeManga($id)) {
                     $logArray[Logger::STATUS] = Logger::STATUS_OK;
-                    echo '<script>window.location.replace("?go=' . self::ROUTE_EDIT_MANGA . '");</script>';
+                    echo '<script>';
+                    echo 'alert("Манга удалена");';
+                    echo 'window.location.replace("?go=' . self::ROUTE_EDIT_MANGA . '");';
+                    echo '</script>';
                 }
                 else {
                     $logArray[Logger::STATUS] = Logger::STATUS_FAIL;
@@ -550,7 +556,10 @@ class Router extends Main {
                             $episode[EpisodeDataAdapter::COL_DUB_VIDEO_ID], $episode[EpisodeDataAdapter::COL_DUB_SUB_PATH]);
                         
                         $logArray[Logger::STATUS] = Logger::STATUS_OK;
-                        echo '<script>window.location.replace("?go=' . self::ROUTE_UPLOAD_EPISODE . '&set_anime_id=' . $animeId . '&set_id=' . $episodeId . '");</script>';
+                        echo '<script>';
+                        echo 'alert("Эпизод добавлен");';
+                        echo 'window.location.replace("?go=' . self::ROUTE_UPLOAD_EPISODE . '&set_anime_id=' . $animeId . '&set_id=' . $episodeId . '");';
+                        echo '</script>';
                     }
                     else {
                         $logArray[Logger::STATUS] = Logger::STATUS_FAIL;
@@ -620,6 +629,10 @@ class Router extends Main {
                             $episode[EpisodeDataAdapter::COL_SUB_VIDEO_ID], $episode[EpisodeDataAdapter::COL_SUB_PATH],
                             $episode[EpisodeDataAdapter::COL_DUB_VIDEO_ID], $episode[EpisodeDataAdapter::COL_DUB_SUB_PATH]);
                     
+                    echo '<script>';
+                    echo 'alert("Эпизод обновлен");';
+                    echo '</script>';
+                    
                     $logArray = array(
                                 Logger::IP => $this->_getCurrentUserIp(),
                                 Logger::ACTION => Logger::ACTION_EPISODE_UPDATE,
@@ -640,7 +653,10 @@ class Router extends Main {
                     
                     if ($episodeAdapter->removeEpisode($episodeId)) {
                         $logArray[Logger::STATUS] = Logger::STATUS_OK;
-                        echo '<script>window.location.replace("?go=' . self::ROUTE_UPLOAD_EPISODE . '&set_anime_id=' . $animeId . '");</script>';
+                        echo '<script>';
+                        echo 'alert("Эпизод удален");';
+                        echo 'window.location.replace("?go=' . self::ROUTE_UPLOAD_EPISODE . '&set_anime_id=' . $animeId . '");';
+                        echo '</script>';
                     }
                     else {
                         $logArray[Logger::STATUS] = Logger::STATUS_FAIL;
@@ -744,7 +760,10 @@ class Router extends Main {
                     
                     if ($chapterId) {
                         $logArray[Logger::STATUS] = Logger::STATUS_OK;
-                        echo '<script>window.location.replace("?go=' . self::ROUTE_UPLOAD_CHAPTER . '&set_manga_id=' . $mangaId . '&set_id=' . $chapterId . '");</script>';
+                        echo '<script>';
+                        echo 'alert("Глава добавлена");';
+                        echo 'window.location.replace("?go=' . self::ROUTE_UPLOAD_CHAPTER . '&set_manga_id=' . $mangaId . '&set_id=' . $chapterId . '");';
+                        echo '</script>';
                     }
                     else {
                         $logArray[Logger::STATUS] = Logger::STATUS_FAIL;
@@ -838,6 +857,10 @@ class Router extends Main {
                             $chapter[ChapterDataAdapter::COL_CHAPTER_NAME], $chapter[ChapterDataAdapter::COL_LINKS],
                             $chapter[ChapterDataAdapter::COL_DOWNLOAD]);
                     
+                    echo '<script>';
+                    echo 'alert("Глава обновлена");';
+                    echo '</script>';
+                    
                     $logArray = array(
                                 Logger::IP => $this->_getCurrentUserIp(),
                                 Logger::ACTION => Logger::ACTION_CHAPTER_UPDATE,
@@ -858,7 +881,10 @@ class Router extends Main {
                     
                     if ($chapterAdapter->removeChapter($chapterId)) {
                         $logArray[Logger::STATUS] = Logger::STATUS_OK;
-                        echo '<script>window.location.replace("?go=' . self::ROUTE_UPLOAD_CHAPTER . '&set_manga_id=' . $mangaId . '");</script>';
+                        echo '<script>';
+                        echo 'alert("Глава удалена");';
+                        echo 'window.location.replace("?go=' . self::ROUTE_UPLOAD_CHAPTER . '&set_manga_id=' . $mangaId . '");';
+                        echo '</script>';
                     }
                     else {
                         $logArray[Logger::STATUS] = Logger::STATUS_FAIL;
