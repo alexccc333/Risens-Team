@@ -938,20 +938,22 @@ class Router extends Main {
         $page = isset($_GET['page']) ? intval($_GET['page']) : 0;
         $logs = Logger::getInstance()->getPage($page);
         echo '<hr><table width="100%">';
-        echo '<tr><td>ID действия</td><td>ID пользователя</td><td>Время</td><td width="50%">Контент</td></tr>';
+        echo '<tr><th>ID действия</th><th>Пользователь</th><th>Время</th><td width="50%">Контент</td></tr>';
         
         foreach ($logs as $log) {
             echo '<tr>';
             
+            $userName = Logger::getInstance()->getUserNameById($log[LoggerDataAdapter::COL_USER]);
+            
             echo '<td>' . $log[LoggerDataAdapter::COL_ID] . '</td>';
-            echo '<td>' . $log[LoggerDataAdapter::COL_USER] . '</td>';
+            echo '<td>' . $userName . ' (' . $log[LoggerDataAdapter::COL_USER] . ')</td>';
             echo '<td>' . $log[LoggerDataAdapter::COL_DATE] . '</td>';
             
             $values = json_decode($log[LoggerDataAdapter::COL_VALUE]);
             
-            echo '<td><table width="100%" border="1px"><tr>';
+            echo '<td><table width="10%" border="3px"><tr>';
             foreach ($values as $key => $val) {
-                echo '<td>' . $key . '</td>';
+                echo '<th>' . $key . '</th>';
             }
             echo '</tr><tr>';
             foreach ($values as $key => $val) {
@@ -959,7 +961,7 @@ class Router extends Main {
                     echo '<td>' . $val . '</td>';
                 }
                 else {
-                    echo '<td><table width="100%" border="1px"><tr>';
+                    echo '<td><table width="30%" border="1px"><tr>';
                     
                     foreach ($val as $contentKey => $content) {
                         echo '<td>' . $contentKey . '</td>';
