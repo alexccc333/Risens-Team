@@ -10,6 +10,7 @@ include 'Frame/Main.php';
 include 'Frame/Extension.php';
 include 'Log/Log.php';
 include 'Frame/GetManga.php';
+include 'Admin/YandexDiskAdapter.php';
 
 $id = intval($_GET['id']);
 $currentChapter = isset($_GET['chapter']) ? intval($_GET['chapter']) : 0;

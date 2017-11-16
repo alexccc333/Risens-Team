@@ -158,8 +158,10 @@ class GetManga extends Main {
 	protected function _printPagesAndDownloadLink() {
 		echo '<h3 style="color: white">' . $this->_data[self::CHAPTER_NAME] . '</h3>';
 		echo '<script>';
-		echo 'var pages = [' . $this->_data[self::PAGES] . '];' . PHP_EOL;
-		echo 'var dl = "' . $this->_data[self::DOWNLOAD_LINK] . '";';
+        $yandexAdapter = new YandexDiskAdapter($this->_mysqli);
+        $data = $yandexAdapter->getManga('Manga/Golem Hearts/1', $this->_currentChapterId);
+		echo 'var pages = ' . $data[0] . PHP_EOL;
+		echo 'var dl = "' . $data[1] . '";';
 		echo '</script>';
 	}
 }

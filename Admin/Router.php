@@ -4,6 +4,7 @@ include 'Admin/AnimeDataAdapter.php';
 include 'Admin/MangaDataAdapter.php';
 include 'Admin/EpisodeDataAdapter.php';
 include 'Admin/ChapterDataAdapter.php';
+include 'Admin/YandexDiskAdapter.php';
 
 class Router extends Main {
     protected $_currentUser;
