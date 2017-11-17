@@ -54,6 +54,13 @@ class MangaCacheDataAdapter extends DataAdapter {
         return $status;
     }
     
+    public function clearCache() {
+        $sql = $this->_mysqli->prepare('TRUNCATE TABLE `manga_cache`');
+        $status = $sql->execute();
+        
+        return $status;
+    }
+    
     public function removeMangaFromCacheByChapterId($id) {
         $sql = $this->_mysqli->prepare('DELETE FROM `manga_cache` WHERE `chapter_id` = ?');
         $sql->bind_param('i', $id);

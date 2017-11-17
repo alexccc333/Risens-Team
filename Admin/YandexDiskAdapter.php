@@ -1,12 +1,13 @@
 <?php
 
 class YandexDiskAdapter {
-    const GET_FILES_IN_FOLDER_URL = 'https://cloud-api.yandex.net:443/v1/disk/resources?path=';
+    const GET_FILES_IN_FOLDER_URL = 'https://cloud-api.yandex.net:443/v1/disk/resources?limit=500&path=';
     const GET_DONWLOAD_LINK_FOR_FILE_URL = 'https://cloud-api.yandex.net:443/v1/disk/resources/download?path=';
     const CREATE_FOLDER_URL = 'https://cloud-api.yandex.net:443/v1/disk/resources?path=';
     const UPLOAD_FILE_URL = 'https://cloud-api.yandex.net:443/v1/disk/resources/upload?overwrite=true&path=';
     const CHECK_URL = 'https://cloud-api.yandex.net:443/v1/disk/resources?path=';
     const DELETE_URL = 'https://cloud-api.yandex.net:443/v1/disk/resources?path=';
+    const URL_UPLOAD_URL = 'https://cloud-api.yandex.net:443/v1/disk/resources/upload?path=';
     
     const MANGA_FOLDER = 'Manga';
     
@@ -31,7 +32,7 @@ class YandexDiskAdapter {
         
         if (!$cache) {
             $files = $this->_getFilesInFolder($path);
-            $link = $this->_getDonwloadLink($path);
+            $link = $this->_getDownloadLink($path);
             $this->_addToCache($files, $link, $chapterId);
             return array($files, $link);
         }
@@ -49,9 +50,8 @@ class YandexDiskAdapter {
     }
 
     protected function _getFilesInFolder($path) {
-        $this->createFolder($path);
-        
         $path = $this->_convertPath($path);
+        
         $url = self::GET_FILES_IN_FOLDER_URL . $path;
         $context = $this->_getRequestContext();
         
@@ -61,7 +61,7 @@ class YandexDiskAdapter {
         return $this->_getDownloadLinks($pages);
     }
     
-    protected function _getDonwloadLink($path) {
+    protected function _getDownloadLink($path) {
         $path = $this->_convertPath($path);
         $url = self::GET_DONWLOAD_LINK_FOR_FILE_URL . $path;
         $context = $this->_getRequestContext();
@@ -74,6 +74,7 @@ class YandexDiskAdapter {
     protected function _parseFilesInFolder($response) {
         $decodedResponse = json_decode($response);
         $items = $decodedResponse->_embedded->items;
+        
         $returnArray = array();
         
         foreach ($items as $item) {
@@ -107,12 +108,12 @@ class YandexDiskAdapter {
     }
     
     protected function _checkPath($path) {
-        return true;
         $path = $this->_convertPath($path);
         $url = self::CHECK_URL . $path;
         $header = array('Authorization: OAuth ' . YANDEX_TOKEN);
         
         $ch = curl_init();
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
         curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
@@ -120,7 +121,7 @@ class YandexDiskAdapter {
         $info = curl_getinfo($ch);
         curl_close($ch);
         
-        return $info['http_code'] == '201';
+        return $info['http_code'] === 201;
     }
     
     public function clearFolder($chapterId) {
@@ -131,6 +132,7 @@ class YandexDiskAdapter {
             $header = array('Authorization: OAuth ' . YANDEX_TOKEN);
 
             $ch = curl_init();
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLOPT_URL, $url);
             curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'DELETE');
             curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
@@ -144,23 +146,27 @@ class YandexDiskAdapter {
     }
     
     public function createFolder($path) {
+        $path = $this->_convertPath($path);
         if ($this->_checkPath($path)) {
             return;
         }
         
-        $path = $this->_convertPath($path);
         $url = self::CREATE_FOLDER_URL . $path;
         $header = array('Authorization: OAuth ' . YANDEX_TOKEN);
         
         $ch = curl_init();
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'PUT');
         curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
         curl_exec($ch);
         $info = curl_getinfo($ch);
         curl_close($ch);
-        if ($info['http_code'] != '201') {
-            echo 'Error';
+        if ($info['http_code'] !== 201) {
+            echo 'Error ' . $info['http_code'];
+        }
+        if ($info['http_code'] == 409) {
+            debug_print_backtrace();
         }
     }
     
@@ -178,6 +184,7 @@ class YandexDiskAdapter {
         $header = array('Authorization: OAuth ' . YANDEX_TOKEN);
         
         $ch = curl_init();
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_URL, $uploadUrl);
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'PUT');
         curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
@@ -185,9 +192,38 @@ class YandexDiskAdapter {
         curl_exec($ch);
         $info = curl_getinfo($ch);
         curl_close($ch);
-        if ($info['http_code'] != '201') {
-            echo 'Error';
+        if ($info['http_code'] !== 201) {
+            echo 'Error2';
         }
+    }
+    
+    public function uploadFileByUrl($url, $path) {
+        $path = $this->_convertPath($path);
+        
+        if (strpos($url, 'http://') === false) {
+            return;
+        }
+        
+        $requestUrl = self::URL_UPLOAD_URL . $path . '&url=' . $url;
+        var_dump($requestUrl);
+        $header = array('Authorization: OAuth ' . YANDEX_TOKEN);
+        
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_URL, $requestUrl);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+        curl_exec($ch);
+        
+        $info = curl_getinfo($ch);
+        curl_close($ch);
+        if ($info['http_code'] === 201 || $info['http_code'] === 202) {
+            
+        }
+        else {
+            echo ' Error3 ' . $info['http_code'] . PHP_EOL;
+        }
+        
     }
 
     protected function _convertPath($path) {
