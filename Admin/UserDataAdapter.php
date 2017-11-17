@@ -143,4 +143,8 @@ class UserDataAdapter extends DataAdapter {
     public function getChapterAdapter() {
         return new ChapterDataAdapter($this->_mysqli);
     }
+    
+    public function getYandexDiskAdapter() {
+        return new YandexDiskAdapter($this->_mysqli);
+    }
 }

@@ -1,5 +1,5 @@
 <?php
-include 'Admin/DataAdapter.php';
+require_once 'Admin/DataAdapter.php';
 
 class MangaCacheDataAdapter extends DataAdapter {
     
@@ -8,7 +8,7 @@ class MangaCacheDataAdapter extends DataAdapter {
     const COL_EXPIRES = 'expires';
     const COL_PAGES = 'pages';
     const COL_LINK = 'link';
-    const CACHE_LIFETIME = 7200; // 2 часа
+    const CACHE_LIFETIME = 3600; // 1 hour
     
     public function getMangaFromCache($id) {
         $sql = $this->_mysqli->prepare('SELECT pages, link, expires, id from manga_cache WHERE chapter_id=?');
@@ -48,6 +48,14 @@ class MangaCacheDataAdapter extends DataAdapter {
     
     protected function _removeMangaFromCache($id) {
         $sql = $this->_mysqli->prepare('DELETE FROM `manga_cache` WHERE `id` = ?');
+        $sql->bind_param('i', $id);
+        $status = $sql->execute();
+        
+        return $status;
+    }
+    
+    public function removeMangaFromCacheByChapterId($id) {
+        $sql = $this->_mysqli->prepare('DELETE FROM `manga_cache` WHERE `chapter_id` = ?');
         $sql->bind_param('i', $id);
         $status = $sql->execute();
         

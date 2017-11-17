@@ -13,6 +13,7 @@ class Logger {
     const ACTION_CHAPTER_UPLOAD = 'upload_chapter';
     const ACTION_CHAPTER_UPDATE = 'update_chapter';
     const ACTION_CHAPTER_DELETE = 'delete_chapter';
+    const ACTION_CHAPTER_CLEAR  = 'clear_chapter';
     const ACTION_ANIME_CREATE = 'create_anime';
     const ACTION_ANIME_EDIT = 'edit_anime';
     const ACTION_ANIME_DELETE = 'delete_anime';
