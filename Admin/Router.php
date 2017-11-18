@@ -684,9 +684,9 @@ class Router extends Main {
     }
     
     protected function _printUploadChapterMenu() {
+        
         $adapter = $this->_currentUser->getAdapter()->getMangaAdapter();
         $yandexAdapter = $this->_currentUser->getAdapter()->getYandexDiskAdapter();
-        set_time_limit(600);
         $availManga = $this->_currentUser->getAvailManga();
         
         $mangaId = isset($_GET['set_manga_id']) ? intval($_GET['set_manga_id']) : 0;
@@ -748,6 +748,7 @@ class Router extends Main {
                         );
                     
                     if ($chapterId) {
+                        $yandexAdapter->clearChapterCache($chapterId);
                         $logArray[Logger::STATUS] = Logger::STATUS_OK;
                         echo '<script>';
                         echo 'alert("Глава добавлена");';
@@ -822,6 +823,7 @@ class Router extends Main {
                             $chapter[ChapterDataAdapter::COL_CHAPTER_NAME], $chapter[ChapterDataAdapter::COL_LINKS],
                             $chapter[ChapterDataAdapter::COL_DOWNLOAD]);
                     
+                    $yandexAdapter->clearChapterCache($chapterId);
                     echo '<script>';
                     echo 'alert("Глава обновлена");';
                     echo '</script>';

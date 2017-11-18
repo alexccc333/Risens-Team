@@ -225,7 +225,11 @@ class YandexDiskAdapter {
         }
         
     }
-
+    
+    public function clearChapterCache($chapterId) {
+        $this->_adapter->removeMangaFromCacheByChapterId($chapterId);
+    }
+    
     protected function _convertPath($path) {
         $path = str_replace(' ', '%20', $path);
         return str_replace('/', '%2F', $path);
