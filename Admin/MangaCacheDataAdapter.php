@@ -25,7 +25,7 @@ class MangaCacheDataAdapter extends DataAdapter {
                 return false;
             }
             
-			return $row;
+			return $row[MangaCacheDataAdapter::COL_PAGES];
 		}
         
 		return false;
