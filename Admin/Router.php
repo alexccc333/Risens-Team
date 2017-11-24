@@ -764,10 +764,11 @@ class Router extends Main {
                     Logger::getInstance()->log($id, $logArray);
                 }
                 else {
-                    echo '<br><a href="?go=' . self::ROUTE_UPLOAD_CHAPTER . '&set_manga_id=' . $mangaId . '">Назад</a>';
+                    $num = (isset($_GET['next_num'])) ? intval($_GET['next_num']) : '';
+                    echo '<br><a href="?go=' . self::ROUTE_UPLOAD_CHAPTER . '&set_manga_id=' . $mangaId . '">Назад</a>';    
                     echo '<form enctype="multipart/form-data" action="adminpanel.php?go=' . self::ROUTE_UPLOAD_CHAPTER . '&set_manga_id=' . $mangaId . '&new_chapter" method="post">';
-                    echo 'Название главы с номером: <input type="text" required name="name" id="name" value="Глава " /><br>';
-                    echo 'Порядковый номер главы (для списка): <input type="text" required name="number" id="number" /><br>';
+                    echo 'Название главы с номером: <input type="text" required name="name" id="name" value="Глава ' . $num . '" /><br>';
+                    echo 'Порядковый номер главы (для списка): <input type="text" required name="number" id="number" value="' . $num . '" /><br>';
                     echo 'Название главы: <input type="text" name="chapter_name" id="chapter_name" /><hr>';
                     echo '<input type="file" name="chapter_files[]" id="chapter_files" multiple><br>';
                     echo '<input type="submit" value="Submit"><hr>';
@@ -884,7 +885,8 @@ class Router extends Main {
                     $id = $this->_currentUser->getId();
                     Logger::getInstance()->log($id, $logArray);
                 }
-                
+                $nextNum = intval($chapter[ChapterDataAdapter::COL_NUMBER]) + 1;
+                echo '<br><a href="?go=' . self::ROUTE_UPLOAD_CHAPTER . '&set_manga_id=' . $mangaId . '&new_chapter&next_num=' . $nextNum . '">Добавить следующую главу</a>';
                 echo '<form enctype="multipart/form-data" action="adminpanel.php?go=' . self::ROUTE_UPLOAD_CHAPTER . '&set_manga_id=' . $mangaId . '&set_id=' . $chapterId . '" method="post">';
                 echo 'Название главы с номером: <input type="text" required name="name" id="name" value="' . $chapter[ChapterDataAdapter::COL_NAME] . '" /><br>';
                 echo 'Порядковый номер главы (для списка): <input type="text" required name="number" id="number" value="' . $chapter[ChapterDataAdapter::COL_NUMBER] . '" /><br>';
