@@ -6,6 +6,7 @@ include 'Admin/EpisodeDataAdapter.php';
 include 'Admin/ChapterDataAdapter.php';
 include 'Admin/MangaCacheDataAdapter.php';
 include 'Admin/YandexDiskAdapter.php';
+include 'Admin/ApiDataAdapter.php';
 
 class Router extends Main {
     protected $_currentUser;
@@ -20,6 +21,9 @@ class Router extends Main {
     const ROUTE_EDIT_USER_PRIVILEGES = 'edituserprivileges';
     const ROUTE_CREATE_NEW_USER = 'createnewuser';
     const ROUTE_SHOW_LOGS = 'showlogs';
+    const ROUTE_API_KEYS = 'apikeys';
+    const ROUTE_API_KEYS_MANAGE = 'manageapikeys';
+    const ROUTE_API_KEYS_UPDATE = 'updatekeysdata';
     
     public function setUser($user) {
         $this->_currentUser = $user;
@@ -73,6 +77,15 @@ class Router extends Main {
                     break;
                 case self::ROUTE_SHOW_LOGS:
                     $this->_showLogs();
+                    break;
+                case self::ROUTE_API_KEYS:
+                    $this->_setApiKeys();
+                    break;
+                case self::ROUTE_API_KEYS_MANAGE:
+                    $this->_manageApiKeys();
+                    break;
+                case self::ROUTE_API_KEYS_UPDATE:
+                    $this->_updateKeyData();
                     break;
                 case self::ROUTE_CREATE_ANIME:
                     $this->_printNewAnimeMenu();
@@ -138,6 +151,8 @@ class Router extends Main {
                 echo '<a href="?go=' . self::ROUTE_CREATE_NEW_USER . '">Создание нового пользователя</a><br>';
                 echo '<a href="?go=' . self::ROUTE_EDIT_USER_PRIVILEGES . '">Редактировать привилегии пользователей</a><br>';
                 echo '<a href="?go=' . self::ROUTE_SHOW_LOGS . '">Посмотреть логи</a><br>';
+                echo '<a href="?go=' . self::ROUTE_API_KEYS . '">Создание ключа для API</a><br>';
+                echo '<a href="?go=' . self::ROUTE_API_KEYS_MANAGE . '">Управление API ключами</a><br>';
                 echo '</p><hr>';
             case UserEnum::ROLE_ADMIN:
                 echo '<p class="text-center">';
@@ -288,6 +303,58 @@ class Router extends Main {
             }
             echo '</form>';
         }
+    }
+
+    protected function _setApiKeys() {
+
+        if(isset($_POST['user_id'])) {
+
+            $adapter = $this->_currentUser->getAdapter()->getApiAdapter();
+            $reg = $adapter->registerKey();
+
+            $logArray = array(
+                Logger::IP => $this->_getCurrentUserIp(),
+                Logger::ACTION => Logger::ACTION_APIKEY_CREATE,
+            );
+            $id = $this->_currentUser->getId();
+            Logger::getInstance()->log($id, $logArray);
+
+        } else {
+
+            echo '<form action="adminpanel.php?go=' . self::ROUTE_API_KEYS . '" method="post">';
+            echo '<br>User ID: <input type="text" name="user_id" id="uid">';
+            echo '<br><input type="submit" value="Send">';
+            echo '<br></form>';
+
+        }
+
+    }
+
+    protected function _manageApiKeys() {
+
+        $adapter = $this->_currentUser->getAdapter()->getApiAdapter();
+
+        $keys = $adapter->getUserKeys();
+        foreach($keys as $key) {
+            echo "<br>" .
+                "<form action='adminpanel.php?go=" . self::ROUTE_API_KEYS_UPDATE . "' method='post'>" . "<br>" .
+                '№ '. $key['id'] . "<input name='id' type='hidden' value='" . $key['id'] . "'><br>" .
+                " User ID: " . "<input name='user_id' type='text' id='uid' value='" .$key['user_id'] . "'><br><br>" .
+                " Old API Key: " . $key['api_key'] . "<br>".
+                "Сгенерировать ключ заново? <input name='new_key' type='checkbox'>"  . "<br>".
+                " Status: <input name='status' type='radio' value='1'" . (isset($key['active']) && $key['active'] == 1 ? "checked='checked'" : false ).">Активен " .
+                "<input name='status' type='radio' value='0'" . (isset($key['active']) && $key['active'] == 0 ? "checked='checked'" : false ) . ">Неактивен" . "<br>" .
+                "<input name='submit' type='submit' value='Submit changes'>" ."</form><br><br>";
+        }
+
+    }
+
+    protected function _updateKeyData() {
+
+        $adapter = $this->_currentUser->getAdapter()->getApiAdapter();
+
+        $update = $adapter->updateData();
+
     }
     
     protected function _printNewAnimeMenu() {

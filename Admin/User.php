@@ -31,11 +31,11 @@ class User {
         $this->_adapter = new UserDataAdapter($mysqli);
         $this->_login = $login;
         $status = $this->_tryLogin($login, $password);
-        
+
         if ($status) {
             $toFetch = $this->_adapter->getDataForUser($this->_id);
             $this->_fillUser($toFetch);
-            
+
             $cookie = hash('sha512', $login . time());
             if ($this->_adapter->setCookieToUser($this->_id, $cookie)) {
                 $this->_cookie = $cookie;
@@ -46,7 +46,7 @@ class User {
         else {
             $this->_isLogged = self::LOGGED_FAILED;
         }
-        
+
         $this->_doLog();
     }
 
