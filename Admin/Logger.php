@@ -24,12 +24,6 @@ class Logger {
     const ACTION_USER_EDIT = 'edit_user';
     const ACTION_USER_DEACTIVATE = 'deactivate_user';
     const ACTION_USER_ACTIVATE = 'activate_user';
-    const ACTION_APIKEY_CREATE = 'create_apikey';
-    const ACTION_APIKEY_CHANGE = 'change_apikey';
-    const ACTION_APIKEY_DELETE = 'delete_apikey';
-    const ACTION_APIKEY_ENABLE = 'enable_apikey';
-    const ACTION_APIKEY_DISABLE = 'disable_apikey';
-    const APIKEY = 'apikey';
     const CONTENT_BEFORE = 'content_before';
     const CONTENT_AFTER = 'content_after';
     const SUBJECT_ID = 'subject_id';

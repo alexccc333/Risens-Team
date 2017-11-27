@@ -312,13 +312,6 @@ class Router extends Main {
             $adapter = $this->_currentUser->getAdapter()->getApiAdapter();
             $reg = $adapter->registerKey();
 
-            $logArray = array(
-                Logger::IP => $this->_getCurrentUserIp(),
-                Logger::ACTION => Logger::ACTION_APIKEY_CREATE,
-            );
-            $id = $this->_currentUser->getId();
-            Logger::getInstance()->log($id, $logArray);
-
         } else {
 
             echo '<form action="adminpanel.php?go=' . self::ROUTE_API_KEYS . '" method="post">';
