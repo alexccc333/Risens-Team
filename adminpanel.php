@@ -11,9 +11,6 @@ include 'Admin/Logger.php';
 
 Logger::getInstance()->setAdapter(new LoggerDataAdapter($mysqli));
 $currentUser = new User();
-$form = new Router();
-
-$form->setHead($head);
 
 if (isset($_POST['login']) && isset($_POST['password'])) {
     $login = strtolower($_POST['login']);
@@ -28,6 +25,8 @@ elseif (isset($_COOKIE['user_cookie'])) {
     $currentUser->loginByCookie($_COOKIE['user_cookie'], $mysqli);
 }
 
+$form = new Router();
+$form->setHead($head);
 $form->printHead();
 $form->setUser($currentUser);
 $form->printBody();

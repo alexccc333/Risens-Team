@@ -306,25 +306,19 @@ class Router extends Main {
     }
 
     protected function _setApiKeys() {
-
         if(isset($_POST['user_id'])) {
 
             $adapter = $this->_currentUser->getAdapter()->getApiAdapter();
             $reg = $adapter->registerKey();
-
         } else {
-
             echo '<form action="adminpanel.php?go=' . self::ROUTE_API_KEYS . '" method="post">';
             echo '<br>User ID: <input type="text" name="user_id" id="uid">';
             echo '<br><input type="submit" value="Send">';
             echo '<br></form>';
-
         }
-
     }
 
     protected function _manageApiKeys() {
-
         $adapter = $this->_currentUser->getAdapter()->getApiAdapter();
 
         $keys = $adapter->getUserKeys();
@@ -339,15 +333,11 @@ class Router extends Main {
                 "<input name='status' type='radio' value='0'" . (isset($key['active']) && $key['active'] == 0 ? "checked='checked'" : false ) . ">Неактивен" . "<br>" .
                 "<input name='submit' type='submit' value='Submit changes'>" ."</form><br><br>";
         }
-
     }
 
     protected function _updateKeyData() {
-
         $adapter = $this->_currentUser->getAdapter()->getApiAdapter();
-
         $update = $adapter->updateData();
-
     }
     
     protected function _printNewAnimeMenu() {

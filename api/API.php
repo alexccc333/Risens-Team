@@ -52,28 +52,4 @@ class API {
             return json_encode($returnArray);
         }
     }
-
-    //Метод проверки ключа
-    public function checkAPIKey($key) {
-
-        //Делаем запрос к базе для проверки существования и активности переданного в функцию ключа
-        $sql = $this->_mysqli->prepare('SELECT * FROM api_keys WHERE api_key=? AND active=1');
-        $sql->bind_param('s', $key);
-        $status = $sql->execute();
-
-        if ($status) {
-            $result = $sql->get_result();
-            $returnArray = array();
-
-            $row = $result->fetch_assoc();
-            while ($row) {
-                $returnArray[] = $row;
-                $row = $result->fetch_assoc();
-            }
-            $result->free();
-
-            return $returnArray;
-        }
-
-    }
 }
