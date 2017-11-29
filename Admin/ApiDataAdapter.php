@@ -42,7 +42,7 @@ class ApiDataAdapter extends DataAdapter {
     public function updateData() {
         //Создаем ключ, если надо переписать и переменные для $_POST значений
         $uid = intval($_POST['user_id']);
-        $new_key = hash('sha512', $uid . time() . SALT);
+        $newKey = hash('sha512', $uid . time() . SALT);
         $status = boolval($_POST['status']);
         $id = intval($_POST['id']);
 
@@ -53,7 +53,7 @@ class ApiDataAdapter extends DataAdapter {
         //Проверяем, если повторная генерация отмечена, то берём запрос $queryWithKey, иначе $queryWithoutKey
         if(isset($_POST['new_key'])){
             $sql = $this->_mysqli->prepare($queryWithKey);
-            $sql->bind_param('is', $uid, $new_key);
+            $sql->bind_param('is', $uid, $newKey);
         } else {
             $sql = $this->_mysqli->prepare($queryWithoutKey);
             $sql->bind_param('i', $uid);
