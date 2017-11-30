@@ -307,9 +307,19 @@ class Router extends Main {
 
     protected function _setApiKeys() {
         if(isset($_POST['user_id'])) {
-
             $adapter = $this->_currentUser->getAdapter()->getApiAdapter();
             $reg = $adapter->registerKey();
+            
+            if ($reg) {
+                $logArray = array(
+                                Logger::IP => $this->_getCurrentUserIp(),
+                                Logger::ACTION => Logger::ACTION_API_KEY_CREATE,
+                                Logger::STATUS => Logger::STATUS_OK,
+                                Logger::SUBJECT_ID => $reg
+                        );
+                $id = $this->_currentUser->getId();
+                Logger::getInstance()->log($id, $logArray);
+            }
         } else {
             echo '<form action="adminpanel.php?go=' . self::ROUTE_API_KEYS . '" method="post">';
             echo '<br>User ID: <input type="text" name="user_id" id="uid">';
@@ -337,7 +347,22 @@ class Router extends Main {
 
     protected function _updateKeyData() {
         $adapter = $this->_currentUser->getAdapter()->getApiAdapter();
+        $contentBefore = $adapter->getKey();
         $update = $adapter->updateData();
+        $contentAfter = $adapter->getKey();
+        
+        if ($update) {
+            $logArray = array(
+                                Logger::IP => $this->_getCurrentUserIp(),
+                                Logger::ACTION => Logger::ACTION_API_KEY_CREATE,
+                                Logger::STATUS => Logger::STATUS_OK,
+                                Logger::SUBJECT_ID => $update,
+                                Logger::CONTENT_BEFORE => $contentBefore,
+                                Logger::CONTENT_AFTER => $contentAfter,
+                        );
+            $id = $this->_currentUser->getId();
+            Logger::getInstance()->log($id, $logArray);
+        }
     }
     
     protected function _printNewAnimeMenu() {

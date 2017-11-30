@@ -11,17 +11,17 @@ class ApiDataAdapter extends DataAdapter {
         $done = $sql->execute();
 
         if($done) {
-            echo "<p class=\"text-center\">$key</p>";
-            return $key;
+            echo '<p class=\"text-center\">' . $key . '</p>';
+            return $sql->insert_id;
         } else {
-            echo "<p class=\"text-center\">API ключ для этого пользователя уже существует!</p>"; //Всё волшебство работает так, что на одного пользователя один ключ
+            echo '<p class=\"text-center\">API ключ для этого пользователя уже существует!</p>'; //Всё волшебство работает так, что на одного пользователя один ключ
             return false;  //Поэтому при создании таблицы поле user_id я сделал уникальным. Если так не надо, то это сообщение можно либо убрать, либо оставить для ошибок
         }
     }
 
     public function getUserKeys() {
         //Тут всё просто, берутся все записи и возвращаются массивом, который потом разбираем
-        $sql = $this->_mysqli->prepare('SELECT * from api_keys WHERE 1');
+        $sql = $this->_mysqli->prepare('SELECT * from api_keys');
         $status = $sql->execute();
 
         if ($status) {
@@ -38,7 +38,23 @@ class ApiDataAdapter extends DataAdapter {
             return $returnArray;
         }
     }
+    
+    public function getKey() {
+        $uid = intval($_POST['user_id']);
+       
+        $sql = $this->_mysqli->prepare('SELECT * from api_keys WHERE user_id=?');
+        $sql->bind_param('i', $uid);
+        
+        $status = $sql->execute();
+        if ($status) {
+            $result = $sql->get_result();
+            $returnArray = array();
 
+            $row = $result->fetch_assoc();
+            return $row;
+        }
+    }
+    
     public function updateData() {
         //Создаем ключ, если надо переписать и переменные для $_POST значений
         $uid = intval($_POST['user_id']);
@@ -62,7 +78,7 @@ class ApiDataAdapter extends DataAdapter {
 
         if($result) {
             echo "<p class=\"text-center\">Data updated!</p>";
-            return true;
+            return $id;
         } else {
             return false;
         }
