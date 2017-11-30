@@ -28,16 +28,16 @@ class YandexDiskAdapter {
     
     public function getManga($chapterId) {
         $path = $this->_convertPath(self::MANGA_FOLDER . '/' . $chapterId);
-        $cache = $this->_checkCache($chapterId);
+        $files = $this->_checkCache($chapterId);
+        $link = $this->_getDownloadLink($path);
         
-        if (!$cache) {
+        if (!$files) {
             $files = $this->_getFilesInFolder($path);
-            $link = $this->_getDownloadLink($path);
             $this->_addToCache($files, $link, $chapterId);
             return array($files, $link);
         }
         else {
-            return array($cache[MangaCacheDataAdapter::COL_PAGES], $cache[MangaCacheDataAdapter::COL_LINK]);
+            return array($files, $link);
         }
     }
     
