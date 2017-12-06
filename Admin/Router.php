@@ -896,6 +896,12 @@ class Router extends Main {
                 echo '<input type="submit" value="Submit"><hr>';
                 echo '<a href="adminpanel.php?go=' . self::ROUTE_UPLOAD_CHAPTER . '&set_manga_id=' . $mangaId . '&set_id=' . $chapterId . '&delete">Удалить</a>';
                 echo '</form>';
+                    
+                echo '<hr>';
+                $pages = $yandexAdapter->getListOfPages($chapterId);
+                foreach ($pages as $page) {
+                    echo $page . '<br>';
+                }
             }
         }
     }

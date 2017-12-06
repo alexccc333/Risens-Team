@@ -21,6 +21,9 @@ class GetManga extends Main {
 	const COL_CHAPTER_NAME = 'chaptername';
 	const COL_CHAPTER_ALIAS = 'name';
 	const COL_NAME = 'name';
+    
+    const DL_LINK = 'http://risensteam.ru/dl.php';
+    const CHAPTER_PARAMETER = 'chapter_id=';
 	
 	public function __construct($id, $mysqli, $currentChapterId) {
 		$this->_id = $id;
@@ -157,12 +160,12 @@ class GetManga extends Main {
 	
 	protected function _printPagesAndDownloadLink() {
         $yandexAdapter = new YandexDiskAdapter($this->_mysqli);
-        $data = $yandexAdapter->getManga($this->_currentChapterId);
+        $files = $yandexAdapter->getManga($this->_currentChapterId);
         
 		echo '<h3 style="color: white">' . $this->_data[self::CHAPTER_NAME] . '</h3>';
 		echo '<script>';
-		echo 'var pages = ' . $data[0] . PHP_EOL;
-		echo 'var dl = "' . $data[1] . '";';
+		echo 'var pages = ' . $files . PHP_EOL;
+		echo 'var dl = "' . self::DL_LINK . '?' . self::CHAPTER_PARAMETER . $this->_currentChapterId . '";';
 		echo '</script>';
 	}
 }

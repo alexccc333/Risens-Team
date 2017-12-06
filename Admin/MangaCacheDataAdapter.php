@@ -31,7 +31,7 @@ class MangaCacheDataAdapter extends DataAdapter {
 		return false;
     }
     
-    public function addMangaCache($chapterId, $pages, $link) {
+    public function addMangaCache($chapterId, $pages, $link = '') {
         $time = time() + self::CACHE_LIFETIME;
         
         $sql = $this->_mysqli->prepare('INSERT INTO `manga_cache`(`id`, `chapter_id`, `expires`, `pages`, `link`) VALUES(NULL,?,?,?,?)');

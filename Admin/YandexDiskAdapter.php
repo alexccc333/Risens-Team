@@ -6,7 +6,7 @@ class YandexDiskAdapter {
     const CREATE_FOLDER_URL = 'https://cloud-api.yandex.net:443/v1/disk/resources?path=';
     const UPLOAD_FILE_URL = 'https://cloud-api.yandex.net:443/v1/disk/resources/upload?overwrite=true&path=';
     const CHECK_URL = 'https://cloud-api.yandex.net:443/v1/disk/resources?path=';
-    const DELETE_URL = 'https://cloud-api.yandex.net:443/v1/disk/resources?path=';
+    const DELETE_URL = 'https://cloud-api.yandex.net:443/v1/disk/resources?force_async=false&path=';
     const URL_UPLOAD_URL = 'https://cloud-api.yandex.net:443/v1/disk/resources/upload?path=';
     
     const MANGA_FOLDER = 'Manga';
@@ -29,36 +29,46 @@ class YandexDiskAdapter {
     public function getManga($chapterId) {
         $path = $this->_convertPath(self::MANGA_FOLDER . '/' . $chapterId);
         $files = $this->_checkCache($chapterId);
-        $link = $this->_getDownloadLink($path);
         
         if (!$files) {
             $files = $this->_getFilesInFolder($path);
-            $this->_addToCache($files, $link, $chapterId);
-            return array($files, $link);
+            $this->_addToCache($files, $chapterId);
         }
-        else {
-            return array($files, $link);
-        }
+        
+        return $files;
+    }
+    
+    public function getChapterLink($chapterId) {
+        $path = $this->_convertPath(self::MANGA_FOLDER . '/' . $chapterId);
+        return $this->_getDownloadLink($path);
+    }
+    
+    public function getListOfPages($chapterId) {
+        $path = $this->_convertPath(self::MANGA_FOLDER . '/' . $chapterId);
+        return $this->_getListOfFiles($path);
     }
     
     protected function _checkCache($chapterId) {
         return $this->_adapter->getMangaFromCache($chapterId);
     }
     
-    protected function _addToCache($pages, $link, $chapterId) {
-        $this->_adapter->addMangaCache($chapterId, $pages, $link);
+    protected function _addToCache($pages, $chapterId) {
+        $this->_adapter->addMangaCache($chapterId, $pages);
     }
 
     protected function _getFilesInFolder($path) {
+        $pages = $this->_getListOfFiles($path);
+        return $this->_getDownloadLinks($pages);
+    }
+    
+    protected function _getListOfFiles($path) {
         $path = $this->_convertPath($path);
         
         $url = self::GET_FILES_IN_FOLDER_URL . $path;
         $context = $this->_getRequestContext();
         
         $response = file_get_contents($url, false, $context);
-        $pages = $this->_parseFilesInFolder($response);
-        
-        return $this->_getDownloadLinks($pages);
+        return $this->_parseFilesInFolder($response);
     }
     
     protected function _getDownloadLink($path) {
@@ -121,25 +131,27 @@ class YandexDiskAdapter {
         $info = curl_getinfo($ch);
         curl_close($ch);
         
-        return $info['http_code'] === 201;
+        return $info['http_code'] === 201 || $info['http_code'] === 200;
     }
     
     public function clearFolder($chapterId) {
         $path = $this->_convertPath(self::MANGA_FOLDER . '/' . $chapterId);
         
         if ($this->_checkPath($path)) {
-            $url = self::DELETE_URL . $path;
-            $header = array('Authorization: OAuth ' . YANDEX_TOKEN);
+            $files = $this->_getListOfFiles($path);
+            foreach ($files as $file) {
+                $url = self::DELETE_URL . $this->_convertPath($file);
+                $header = array('Authorization: OAuth ' . YANDEX_TOKEN);
 
-            $ch = curl_init();
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_URL, $url);
-            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'DELETE');
-            curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
-            curl_exec($ch);
-            $info = curl_getinfo($ch);
-            curl_close($ch);
-            
+                $ch = curl_init();
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($ch, CURLOPT_URL, $url);
+                curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'DELETE');
+                curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+                curl_exec($ch);
+                $info = curl_getinfo($ch);
+                curl_close($ch);
+            }
             $this->_adapter->removeMangaFromCacheByChapterId($chapterId);
             return true;
         }
