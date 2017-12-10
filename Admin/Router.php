@@ -330,18 +330,41 @@ class Router extends Main {
 
     protected function _manageApiKeys() {
         $adapter = $this->_currentUser->getAdapter()->getApiAdapter();
+        $keys = $adapter->getUserKeys($_GET['id']);
 
-        $keys = $adapter->getUserKeys();
-        foreach($keys as $key) {
+        //Если в get установлен id, берём его
+        if(isset($_GET['id'])) {
+            $id = $_GET['id'];
+            for($i = 0; $i < count($keys); $i++){
+                if($keys[$i]['id'] == $id){ //Страшным циклом находим нужный нам массив
+                    $ok = $keys[$i]; //И возвращаем его данные
+                }
+            }
+            $data = $ok;
+
             echo "<br>" .
                 "<form action='adminpanel.php?go=" . self::ROUTE_API_KEYS_UPDATE . "' method='post'>" . "<br>" .
-                '№ '. $key['id'] . "<input name='id' type='hidden' value='" . $key['id'] . "'><br>" .
-                " User ID: " . "<input name='user_id' type='text' id='uid' value='" .$key['user_id'] . "'><br><br>" .
-                " Old API Key: " . $key['api_key'] . "<br>".
-                "Сгенерировать ключ заново? <input name='new_key' type='checkbox'>"  . "<br>".
-                " Status: <input name='status' type='radio' value='1'" . (isset($key['active']) && $key['active'] == 1 ? "checked='checked'" : false ).">Активен " .
-                "<input name='status' type='radio' value='0'" . (isset($key['active']) && $key['active'] == 0 ? "checked='checked'" : false ) . ">Неактивен" . "<br>" .
-                "<input name='submit' type='submit' value='Submit changes'>" ."</form><br><br>";
+                ' User: '. $data['name'] . "<input name='id' type='hidden' value='" . $data['id'] . "'><br>" .
+                " User ID: " . "<input name='user_id' type='text' id='uid' value='" .$data['user_id'] . "'><br><br>" .
+                " Old API Key: " . $data['api_key'] . "<br>".
+                " Сгенерировать ключ заново? <input name='new_key' type='checkbox'>"  . "<br>".
+                " Status: <input name='status' type='radio' value='1'" . (isset($data['active']) && $data['active'] == 1 ? "checked='checked'" : false ).">Активен " .
+                "<input name='status' type='radio' value='0'" . (isset($data['active']) && $data['active'] == 0 ? "checked='checked'" : false ) . ">Неактивен" . "<br>" .
+                "<input name='submit' type='submit' value='Submit changes'>" . "</form><br><br>";
+        } else {
+            foreach($keys as $key) {
+                echo "<h3><p class='text-center'><a href=adminpanel.php?go=manageapikeys&id=" . $key['id'] . ">". $key['id'] . ' - ' . $key['name'] . "</a></p></h3>";
+            }
+//            echo "<br>" .
+//                "<form action='adminpanel.php?go=" . self::ROUTE_API_KEYS_UPDATE . "' method='post'>" . "<br>" .
+//                '№ '. $key['id'] . "<input name='id' type='hidden' value='" . $key['id'] . "'><br>" .
+//                " User ID: " . "<input name='user_id' type='text' id='uid' value='" .$key['user_id'] . "'><br><br>" .
+//                " Old API Key: " . $key['api_key'] . "<br>".
+//                "Сгенерировать ключ заново? <input name='new_key' type='checkbox'>"  . "<br>".
+//                " Status: <input name='status' type='radio' value='1'" . (isset($key['active']) && $key['active'] == 1 ? "checked='checked'" : false ).">Активен " .
+//                "<input name='status' type='radio' value='0'" . (isset($key['active']) && $key['active'] == 0 ? "checked='checked'" : false ) . ">Неактивен" . "<br>" .
+//                "<input name='submit' type='submit' value='Submit changes'>" . "</form><br><br>";
+
         }
     }
 
