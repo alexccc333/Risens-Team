@@ -48,9 +48,9 @@ class MangaDataAdapter extends DataAdapter {
         return $status;
     }
     
-    public function createNewManga($name, $folder) {
-        $sql = $this->_mysqli->prepare('INSERT INTO `manga`(`id`, `name`, `folder`) VALUES(NULL,?,?)');
-        $sql->bind_param('ss', $name, $folder);
+    public function createNewManga($name) {
+        $sql = $this->_mysqli->prepare('INSERT INTO `manga`(`id`, `name`) VALUES(NULL,?)');
+        $sql->bind_param('s', $name);
         $status = $sql->execute();
         
         if ($status) {

@@ -4,7 +4,8 @@ class GetAnime extends Main {
 	protected $_id = 0;
 	protected $_poster = '';
 	protected $_name = '';
-	protected $_mysqli = null;
+    protected $_redirect = '';
+    protected $_mysqli = null;
 	protected $_data = null;
 
 	const SUB_IDS = 'subids';
@@ -24,15 +25,16 @@ class GetAnime extends Main {
 	public function __construct($id, $mysqli) {
 		$this->_id = $id;
 		$this->_mysqli = $mysqli;
-		$this->_loadPoster();		
+		$this->_loadPosterAndRedirect();		
 	}
 
-	protected function _loadPoster() {
-		$sql = 'SELECT poster, name FROM anime WHERE id = ' . $this->_id;
+	protected function _loadPosterAndRedirect() {
+		$sql = 'SELECT poster, name, redirect FROM anime WHERE id = ' . $this->_id;
 		$result = $this->_mysqli->query($sql);
 		$fr = $result->fetch_assoc();
 		$this->_poster = $fr['poster'];
 		$this->_name = $fr['name'];
+		$this->_redirect= $fr['redirect'];
 	}
 
 	public function getPoster() {
@@ -80,27 +82,56 @@ class GetAnime extends Main {
 	}
 	
 	public function printBody() {
-		echo '<body style="background-color: black; margin: 0px;">';
-		echo '<div id="selectors">
-			<select id="episodes" class="selectpicker" onchange="changeEpisode(this.selectedIndex)"></select>
-			<select id="subdub" class="selectpicker" onchange="changeDubSub(this.options[this.selectedIndex].innerHTML)"></select>
-			</div>';
-		echo '<video id="mv" class="video-js vjs-default-skin vjs-big-play-centered">
-			<source id ="vide" src="player/newzastavka.mp4" type="video/mp4">
-			</video>';
-		echo '<iframe id="player" src="" width="100%" height="100%" frameborder="0" allowfullscreen=""></iframe>';
-		
-		echo '<script>';
-		echo 'var poster = \'' . $this->_poster . '\';';
-		echo 'var eps = [ ' . $this->_data[self::NAMES] . ' ];';
-		echo 'var ids = [ ' . $this->_data[self::IDS] . ' ];';
-		echo 'var viS = [ ' . $this->_data[self::SUB_IDS] . ' ];';
-		echo 'var suS = [ ' . $this->_data[self::SUB_PATHS] . ' ];';
-		echo 'var viD = [ ' . $this->_data[self::DUB_IDS] . ' ];';
-		echo 'var suD = [ ' . $this->_data[self::DUB_PATHS] . ' ];';
-		
-		echo file_get_contents('Scripts/GetAnimeSetup.js');
-		echo '</script></body>';
+        if ($this->_redirect === '') {
+            echo '<body style="background-color: black; margin: 0px;">';
+            echo '<div id="selectors">
+                <select id="episodes" class="selectpicker" onchange="changeEpisode(this.selectedIndex)"></select>
+                <select id="subdub" class="selectpicker" onchange="changeDubSub(this.options[this.selectedIndex].innerHTML)"></select>
+                </div>';
+            echo '<video id="mv" class="video-js vjs-default-skin vjs-big-play-centered">
+                <source id ="vide" src="player/newzastavka.mp4" type="video/mp4">
+                </video>';
+        
+            echo '<iframe id="player" src="" width="100%" height="100%" frameborder="0" allowfullscreen=""></iframe>';
+
+            echo '<script>';
+            echo 'var poster = \'' . $this->_poster . '\';';
+            echo 'var eps = [ ' . $this->_data[self::NAMES] . ' ];';
+            echo 'var ids = [ ' . $this->_data[self::IDS] . ' ];';
+            echo 'var viS = [ ' . $this->_data[self::SUB_IDS] . ' ];';
+            echo 'var suS = [ ' . $this->_data[self::SUB_PATHS] . ' ];';
+            echo 'var viD = [ ' . $this->_data[self::DUB_IDS] . ' ];';
+            echo 'var suD = [ ' . $this->_data[self::DUB_PATHS] . ' ];';
+
+            echo file_get_contents('Scripts/GetAnimeSetup.js');
+            echo '</script></body>';
+        }
+        else {
+            echo '<body style="background-color: black; margin: 0px;">';
+            
+            echo '<a href="' . $this->_redirect . '" target="_blank">';
+            echo '<video id="mv" class="video-js vjs-default-skin vjs-big-play-centered">
+                <source id ="vide" src="player/newzastavka.mp4" type="video/mp4">
+                </video></a>';
+            
+            echo '<script>';
+            echo 'var poster = \'' . $this->_poster . '\';';
+            echo 'var player = videojs("mv", {
+                    controls: true,
+                    nativeControlsForTouch: false,
+                    width: 640,
+                    height: 360,
+                    fluid: true,
+                    poster: poster
+                });';
+            echo 'player.on("timeupdate", function(){
+                    player.pause();    
+                    document.getElementsByClassName("vjs-poster")[0].style.display = "inline-block";
+                    document.getElementsByClassName("vjs-big-play-button")[0].style.display = "inline-block";
+                    player.controlBar.hide();  
+                 })';
+            echo '</script></body>';
+        }
 	}
 	
 	public function getName() {

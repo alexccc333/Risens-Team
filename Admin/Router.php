@@ -294,7 +294,11 @@ class Router extends Main {
         $adapter = $this->_currentUser->getAdapter()->getAnimeAdapter();
         
         if (isset($_POST['anime_name'])) {
-            $animeId = $adapter->createNewAnime($_POST['anime_name'], $_POST['banner_url']);
+            $name = isset($_POST['anime_name']) ? $_POST['anime_name'] : '';
+            $banner = isset($_POST['banner_url']) ? $_POST['banner_url'] : '';
+            $redirect = isset($_POST['redirect_url']) ? $_POST['redirect_url'] : '';
+            
+            $animeId = $adapter->createNewAnime($name, $banner, $redirect);
             
             $logArray = array(
                         Logger::IP => $this->_getCurrentUserIp(),
@@ -304,7 +308,8 @@ class Router extends Main {
             
             if ($animeId) {
                 $logArray[Logger::STATUS] = Logger::STATUS_OK;
-                echo '<h3><p class="text-center">Anime created</p></h3>';
+                echo '<h3><p class="text-center">Anime created</p></h3><hr>';
+                echo '<input type="text" value="http://risensteam.ru/getnewanime.php?id=' . $animeId . '">';
             }
             else {
                 $logArray[Logger::STATUS] = Logger::STATUS_FAIL;
@@ -318,6 +323,7 @@ class Router extends Main {
         echo '<form action="adminpanel.php?go=' . self::ROUTE_CREATE_ANIME . '" method="post">';
         echo 'Название аниме (англ.): <input type="text" required name="anime_name" id="name" /><br>';
         echo 'Полный путь до баннера: <input type="text" name="banner_url" id="banner" value="http://risens.team/uploads/" /><br>';
+        echo 'Ссылка для редиректа: <input type="text" name="redirect_url" id="redirect" value="" /><br>';
         echo '<input type="submit" value="Submit">';
         echo '</form>';
     }
@@ -341,8 +347,9 @@ class Router extends Main {
             
             if (isset($_POST['anime_name'])) {
                 $contentBefore = $anime;
-                $anime[AnimeDataAdapter::COL_NAME] = $_POST['anime_name'];
-                $anime[AnimeDataAdapter::COL_BANNER] = $_POST['banner_url'];
+                $anime[AnimeDataAdapter::COL_NAME] = isset($_POST['anime_name']) ? $_POST['anime_name'] : '';
+                $anime[AnimeDataAdapter::COL_BANNER] = isset($_POST['banner_url']) ? $_POST['banner_url'] : '';
+                $anime[AnimeDataAdapter::COL_REDIRECT] = isset($_POST['redirect_url']) ? $_POST['redirect_url'] : '';
                 
                 $logArray = array(
                         Logger::IP => $this->_getCurrentUserIp(),
@@ -355,7 +362,7 @@ class Router extends Main {
                 $userId = $this->_currentUser->getId();
                 Logger::getInstance()->log($userId, $logArray);
                 
-                $adapter->updateAnime($id, $anime[AnimeDataAdapter::COL_NAME], $anime[AnimeDataAdapter::COL_BANNER]);
+                $adapter->updateAnime($id, $anime[AnimeDataAdapter::COL_NAME], $anime[AnimeDataAdapter::COL_BANNER], $anime[AnimeDataAdapter::COL_REDIRECT]);
             }
             elseif (isset($_GET['delete'])) {
                 $logArray = array(
@@ -384,6 +391,7 @@ class Router extends Main {
             echo '<form action="adminpanel.php?go=' . self::ROUTE_EDIT_ANIME . '&set_id=' . $id . '" method="post">';
             echo 'Название аниме (англ.): <input type="text" required name="anime_name" id="name" value="' . $anime[AnimeDataAdapter::COL_NAME] . '" /><br>';
             echo 'Полный путь до баннера: <input type="text" name="banner_url" id="banner" value="' . $anime[AnimeDataAdapter::COL_BANNER] . '" /><br>';
+            echo 'Ссылка для редиректа: <input type="text" name="redirect_url" id="redirect" value="' . $anime[AnimeDataAdapter::COL_REDIRECT] . '" /><br>';
             echo '<input type="submit" value="Submit"><hr>';
             echo '<a href="adminpanel.php?go=' . self::ROUTE_EDIT_ANIME . '&set_id=' . $id . '&delete">Удалить</a>';
             echo '</form>';
@@ -394,7 +402,7 @@ class Router extends Main {
         $adapter = $this->_currentUser->getAdapter()->getMangaAdapter();
         
         if (isset($_POST['manga_name'])) {
-            $mangaId = $adapter->createNewManga($_POST['manga_name'], $_POST['folder']);
+            $mangaId = $adapter->createNewManga($_POST['manga_name']);
             
             $logArray = array(
                         Logger::IP => $this->_getCurrentUserIp(),
@@ -404,7 +412,8 @@ class Router extends Main {
             
             if ($mangaId) {
                 $logArray[Logger::STATUS] = Logger::STATUS_OK;
-                echo '<h3><p class="text-center">Manga created</p></h3>';
+                echo '<h3><p class="text-center">Manga created</p></h3><hr>';
+                echo '<input type="text" value="http://risens.team/getmanga.php?id=' . $mangaId . '">';
             }
             else {
                 $logArray[Logger::STATUS] = Logger::STATUS_FAIL;
@@ -417,7 +426,6 @@ class Router extends Main {
         
         echo '<form action="adminpanel.php?go=' . self::ROUTE_CREATE_MANGA . '" method="post">';
         echo 'Название манги (англ.): <input type="text" required name="manga_name" id="name" /><br>';
-        echo 'Папка манги: <input type="text" name="folder" id="folder" /><br>';
         echo '<input type="submit" value="Submit">';
         echo '</form>';
     }
