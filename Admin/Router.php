@@ -330,13 +330,13 @@ class Router extends Main {
 
     protected function _manageApiKeys() {
         $adapter = $this->_currentUser->getAdapter()->getApiAdapter();
-        $keys = $adapter->getUserKeys($_GET['id']);
+        $keys = $adapter->getUserKeys();
 
+        $id = $_GET['id'];
         //Если в get установлен id, берём его
-        if(isset($_GET['id'])) {
-            $id = $_GET['id'];
+        if(isset($id)) {
             for($i = 0; $i < count($keys); $i++){
-                if($keys[$i]['id'] == $id){ //Страшным циклом находим нужный нам массив
+                if($keys[$i]['id'] == intval($id)){ //Страшным циклом находим нужный нам массив
                     $ok = $keys[$i]; //И возвращаем его данные
                 }
             }

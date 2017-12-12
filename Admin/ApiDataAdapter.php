@@ -1,12 +1,13 @@
 <?php
 include_once('DataAdapter.php');
 class ApiDataAdapter extends DataAdapter {
+    const DEFAULT_KEY_STATE = 1; //1 - active, 0 - inactive
 
     public function registerKey() {
         //Создаем ключ из id пользователя, времени и соли
         $uid = intval($_POST['user_id']);
         $key = hash('sha512', $uid . time() . SALT);
-        $defaultKeyState = 1; //1 - active, 0 - inactive
+        $defaultKeyState = self::DEFAULT_KEY_STATE;
 
         $sql = $this->_mysqli->prepare('INSERT INTO `api_keys`(`id`, `user_id`, `date`, `api_key`, `active`) VALUES (NULL ,?, ?, ?, ?)');
         $sql->bind_param('issi', $uid, date("Y-m-d H:i:s", time()), $key, $defaultKeyState);
