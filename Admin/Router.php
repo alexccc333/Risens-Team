@@ -492,7 +492,6 @@ class Router extends Main {
             echo '<br><a href="?go=' . self::ROUTE_EDIT_MANGA . '">Назад</a>';
             echo '<form action="adminpanel.php?go=' . self::ROUTE_EDIT_MANGA . '&set_id=' . $id . '" method="post">';
             echo 'Название манги (англ.): <input type="text" required name="manga_name" id="name" value="' . $manga[MangaDataAdapter::COL_NAME] . '" /><br>';
-            echo 'Папка манги: <input type="text" name="folder" id="folder" value="' . $manga[MangaDataAdapter::COL_FOLDER] . '" /><br>';
             echo '<input type="submit" value="Submit"><hr>';
             echo '<a href="adminpanel.php?go=' . self::ROUTE_EDIT_MANGA . '&set_id=' . $id . '&delete">Удалить</a>';
             echo '</form>';
