@@ -332,11 +332,11 @@ class Router extends Main {
         $adapter = $this->_currentUser->getAdapter()->getApiAdapter();
         $keys = $adapter->getUserKeys();
 
-        $id = $_GET['id'];
+        $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
         //Если в get установлен id, берём его
-        if(isset($id)) {
+        if($id !== 0) {
             for($i = 0; $i < count($keys); $i++){
-                if($keys[$i]['id'] == intval($id)){ //Страшным циклом находим нужный нам массив
+                if($keys[$i]['id'] === $id){ //Страшным циклом находим нужный нам массив
                     $ok = $keys[$i]; //И возвращаем его данные
                 }
             }
