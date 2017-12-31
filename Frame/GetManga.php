@@ -96,7 +96,7 @@ class GetManga extends Main {
 		$logger = new Log($this->_mysqli);
 		$logger->doLog($this);
 		
-		echo '<body style="background-color: #354050;">';
+		echo '<body>';
 		
 		$this->_printPagesAndDownloadLink();
 		
@@ -141,10 +141,10 @@ class GetManga extends Main {
 		echo '</select>';
 		
 		if (isset($tempIds[$this->_currentChapter + 1])) {
-			echo '<a type="button" class="btn btn-primary btn-lg btn-success" href="?id=' . $this->_id . '&chapter=' . $tempIds[$this->_currentChapter + 1] . '">Следующая глава</a>';
+			echo '&nbsp;<a type="button" class="btn btn-primary btn-lg btn-success" href="?id=' . $this->_id . '&chapter=' . $tempIds[$this->_currentChapter + 1] . '">Следующая глава</a>';
 		}
 		else {
-			echo '<a type="button" class="btn btn-primary btn-lg btn-success disabled">Следующая глава</a> ';
+			echo '&nbsp;<a type="button" class="btn btn-primary btn-lg btn-success disabled">Следующая глава</a> ';
 		}
 		
 		echo '</div></div></div></body>';
