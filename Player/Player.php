@@ -60,7 +60,7 @@ class Player {
 			($this->_type !== 'sub' && $this->_type !== 'dub');
 	}
 	
-	public function loadVideo() {
+	public function loadVideo($noLog = false) {
 		if ($this->_checkForScam()) {
 			return '';
 		}
@@ -68,12 +68,16 @@ class Player {
 		$result = $this->_mysqli->query($sql);
 		if ($result) {
 			$playerRow = $result->fetch_assoc();
+			
+			if (($playerRow[$this->_type . 'videoid']) === '') {
+				return;
+			}
+			
 			$this->_episodeName = $playerRow['name'];
 			$this->_animeId = $playerRow['anime_id'];
 			$this->_setAnimeInfo();
 			$videoId = $playerRow[$this->_type . 'videoid'];
 			$this->_subtitleLink = $playerRow[self::PATH_MATCH[$this->_type]];
-			$this->_subtitleLink = str_replace('risensteam.ru', 'localhost/Risens Team/', $this->_subtitleLink);
 			$url = self::SIBNET_VIDEO_URL . $videoId;
 			$videoPage = file_get_contents($url);
 			$pos1 = strpos($videoPage, '/v/');
@@ -93,8 +97,10 @@ class Player {
 			throw new Exception("Episode not found");
 		}
 		
-		$logger = new Log($this->_mysqli);
-		$logger->doLog($this);
+		if (!$noLog) {
+			$logger = new Log($this->_mysqli);
+			$logger->doLog($this);
+		}
 	}
 	
 	public function getLoadedUrl() {

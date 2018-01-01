@@ -87,6 +87,13 @@ class GetAnime extends Main {
             echo '<div id="selectors">
                 <select id="episodes" class="selectpicker" onchange="changeEpisode(this.selectedIndex)"></select>
                 <select id="subdub" class="selectpicker" onchange="changeDubSub(this.options[this.selectedIndex].innerHTML)"></select>
+				<button class="btn btn-secondary hidden-md-down" type="button" id="dropdownDownloadButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+					Скачать
+				</button>
+				<div class="dropdown-menu dropdown-content" aria-labelledby="dropdownDownloadButton">
+					<iframe id="downloadContent" width="100%"></iframe>
+				</div>
+				
                 </div>';
             echo '<video id="mv" class="video-js vjs-default-skin vjs-big-play-centered">
                 <source id ="vide" src="player/newzastavka.mp4" type="video/mp4">
