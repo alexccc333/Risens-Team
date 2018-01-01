@@ -21,16 +21,8 @@ elseif (isset($_GET['episode_id'])) {
 	
 	if ($id !== 0) {
 		include_once 'Admin/DataAdapter.php';
-		include_once 'Admin/EpisodeDataAdapter.php';
 		include_once 'Player/Player.php';
         include_once 'bd.php';
-		
-		$adapter = new EpisodeDataAdapter($mysqli);
-		
-		/*if ($videoId === '') {
-			echo 'К сожалению, скачка для данной серии недоступна';
-			return;
-		}*/
 		
 		$player = new Player($id, $type , $mysqli);
 		$player->loadVideo(true);
@@ -46,7 +38,7 @@ elseif (isset($_GET['episode_id'])) {
 		echo '<a href="' . $videoUrl . '" download>видео</a> ';
 		if ($subUrl !== '') {
 			echo 'и <a href="' . $subUrl . '" download>субтитры</a> к нему';
-			echo '<br>Не забудьте установить <a href="http://risensteam.ru/fonts.zip" download>шрифты</a> для корректного просмотра!</p>';
+			echo '<br>Кликните правой кнопкой по ссылке и нажмите "Сохранить как", чтобы точно скачать файл, также не забудьте установить <a href="http://risensteam.ru/fonts.zip" download>шрифты</a> для корректного просмотра!</p>';
 		}
 	}
 }
