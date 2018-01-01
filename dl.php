@@ -38,7 +38,7 @@ elseif (isset($_GET['episode_id'])) {
 		echo '<a href="' . $videoUrl . '" download>видео</a> ';
 		if ($subUrl !== '') {
 			echo 'и <a href="' . $subUrl . '" download>субтитры</a> к нему';
-			echo '<br>Кликните правой кнопкой по ссылке и нажмите "Сохранить как", чтобы точно скачать файл, также не забудьте установить <a href="http://risensteam.ru/fonts.zip" download>шрифты</a> для корректного просмотра!</p>';
+			echo '<hr>Кликните правой кнопкой по ссылке и нажмите "Сохранить как", чтобы точно скачать файл, также не забудьте установить <a href="http://risensteam.ru/fonts.zip" download>шрифты</a> для корректного просмотра!</p>';
 		}
 	}
 }

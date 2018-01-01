@@ -98,3 +98,5 @@ select#episodes, select#episodes-color, select#subdub, select#subdub-color, sele
 {
     background:orange;
 }
+
+@media screen and (max-width: 600px) { #dropdownDownloadButton { visibility: hidden; clear: both; float: left; margin: 10px auto 5px 20px; width: 28%; display: none; } }
