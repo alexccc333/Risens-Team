@@ -35,7 +35,7 @@ class Main {
 		$this->_player->loadVideo();
 		
 		echo '<body style=" margin: 0px;"><div class="player-wrapper">';
-		echo '<video id="player" class="video-js vjs-default-skin vjs-big-play-centered">';
+		echo '<video id="player" class="video-js vjs-default-skin vjs-big-play-centered" playsinline>';
 		echo '<source id ="vide" src="' . $this->_player->getLoadedUrl() . '" type="video/mp4"></video></div>';
 		
 		echo '<script>';
@@ -44,4 +44,3 @@ class Main {
 		echo '</script></body>';
 	}
 }
-

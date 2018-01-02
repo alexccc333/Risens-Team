@@ -95,7 +95,7 @@ class GetAnime extends Main {
 				</div>
 				
                 </div>';
-            echo '<video id="mv" class="video-js vjs-default-skin vjs-big-play-centered">
+            echo '<video id="mv" class="video-js vjs-default-skin vjs-big-play-centered" playsinline>
                 <source id ="vide" src="player/newzastavka.mp4" type="video/mp4">
                 </video>';
         
@@ -117,7 +117,7 @@ class GetAnime extends Main {
             echo '<body style="background-color: black; margin: 0px;">';
             
             echo '<a href="' . $this->_redirect . '" target="_blank">';
-            echo '<video id="mv" class="video-js vjs-default-skin vjs-big-play-centered">
+            echo '<video id="mv" class="video-js vjs-default-skin vjs-big-play-centered" playsinline>
                 <source id ="vide" src="player/newzastavka.mp4" type="video/mp4">
                 </video></a>';
             

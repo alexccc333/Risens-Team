@@ -2,7 +2,7 @@
 $head = array();
 
 $head[] = new Extension('link', 
-			'https://cdnjs.cloudflare.com/ajax/libs/video.js/5.5.3/video-js.min.css', 
+			'http://vjs.zencdn.net/6.4.0/video-js.css', 
 			'stylesheet');
 
 $head[] = new Extension('link', 
@@ -10,7 +10,7 @@ $head[] = new Extension('link',
 			'stylesheet');
 
 $head[] = new Extension('script', 
-			'https://cdnjs.cloudflare.com/ajax/libs/video.js/5.5.3/video.min.js');
+			'http://vjs.zencdn.net/6.4.0/video.js');
 
 $head[] = new Extension('script', 
 			'player/libjass.js');
