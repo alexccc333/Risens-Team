@@ -115,29 +115,11 @@ class GetAnime extends Main {
         }
         else {
             echo '<body style="background-color: black; margin: 0px;">';
-            
-            echo '<a href="' . $this->_redirect . '" target="_blank">';
-            echo '<video id="mv" class="video-js vjs-default-skin vjs-big-play-centered" playsinline>
-                <source id ="vide" src="player/newzastavka.mp4" type="video/mp4">
-                </video></a>';
-            
-            echo '<script>';
-            echo 'var poster = \'' . $this->_poster . '\';';
-            echo 'var player = videojs("mv", {
-                    controls: true,
-                    nativeControlsForTouch: false,
-                    width: 640,
-                    height: 360,
-                    fluid: true,
-                    poster: poster
-                });';
-            echo 'player.on("timeupdate", function(){
-                    player.pause();    
-                    document.getElementsByClassName("vjs-poster")[0].style.display = "inline-block";
-                    document.getElementsByClassName("vjs-big-play-button")[0].style.display = "inline-block";
-                    player.controlBar.hide();  
-                 })';
-            echo '</script></body>';
+            echo '<div class="overlay"><a href="' . $this->_redirect . '" target="_blank">';
+            echo '<img class="thumbnail" width=100% height=100% src="' . $this->_poster . '"></a>';
+			echo '<a href="' . $this->_redirect . '" class="playWrapper" target="_blank">';
+			echo '<span class="playBtn"><img src="Player/play-button.png" width="50" height="50" alt=""></span>';
+			echo '</a></div></body>';
         }
 	}
 	
