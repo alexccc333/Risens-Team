@@ -23,7 +23,8 @@ class Main {
 	
 	public function printHead() {
 		echo '<head>';
-		
+		echo '<script src="//player.h-cdn.com/loader.js?customer=risens" crossorigin="anonymous" async></script>';
+		echo '<script src="//player2.h-cdn.com/hola_player.js?customer=risens"></script>';
 		foreach ($this->_head as $header) {
 			echo $header;
 		}
@@ -36,7 +37,7 @@ class Main {
 		
 		echo '<body style=" margin: 0px;"><div class="player-wrapper">';
 		echo '<video id="player" class="video-js vjs-default-skin vjs-big-play-centered" playsinline>';
-		echo '<source id ="vide" src="' . $this->_player->getLoadedUrl() . '" type="video/mp4"></video></div>';
+		echo '<source id ="vide" src="' . $this->_player->getLoadedUrl() . '" type="video/mp4"></video>';
 		
 		echo '<script>';
 		echo 'subLink = "' . $this->_player->getSubtitleLink() . '";';

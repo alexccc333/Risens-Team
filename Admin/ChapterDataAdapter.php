@@ -10,7 +10,7 @@ class ChapterDataAdapter extends DataAdapter {
     const COL_DOWNLOAD = 'download';
     
     public function getChaptersByMangaId($mangaId) {
-        $sql = $this->_mysqli->prepare('SELECT id, name, links from chapters WHERE mangaid=?');
+        $sql = $this->_mysqli->prepare('SELECT id, name from chapters WHERE mangaid=?');
         $sql->bind_param('i', $mangaId);
         $status = $sql->execute();
         

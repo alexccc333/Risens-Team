@@ -4,6 +4,7 @@ if (isset($_GET['chapter_id'])) {
     
     if ($id !== 0) {
 		include_once 'Admin/DataAdapter.php';
+		include_once 'Admin/MangaCacheDataAdapter.php';
         include_once 'Admin/YandexDiskAdapter.php';
         include_once 'bd.php';
         

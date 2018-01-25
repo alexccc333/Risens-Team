@@ -162,7 +162,7 @@ class GetManga extends Main {
         $yandexAdapter = new YandexDiskAdapter($this->_mysqli);
         $files = $yandexAdapter->getManga($this->_currentChapterId);
         
-		echo '<h3 style="color: white">' . $this->_data[self::CHAPTER_NAME] . '</h3>';
+		echo '<h3>' . $this->_data[self::CHAPTER_NAME] . '</h3>';
 		echo '<script>';
 		echo 'var pages = ' . $files . PHP_EOL;
 		echo 'var dl = "' . self::DL_LINK . '?' . self::CHAPTER_PARAMETER . $this->_currentChapterId . '";';
