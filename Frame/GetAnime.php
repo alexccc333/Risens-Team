@@ -82,7 +82,22 @@ class GetAnime extends Main {
 	}
 	
 	public function printBody() {
-        if ($this->_redirect === '') {
+        if ($this->_redirect !== '') {
+            if ($this->_data[self::SUB_IDS] === '' && $this->_data[self::DUB_IDS] === '') {
+                $showPlayer = false;
+            } else {
+                include('SxGeo.php'); 
+                $sxGeo = new SxGeo();
+                $ip = $_SERVER['REMOTE_ADDR'];
+                $country = $sxGeo->getCountry($ip);
+                $showPlayer = $country !== 'RU';
+            }
+        }
+        else {
+            $showPlayer = true;
+        }
+        
+        if ($showPlayer) {
             echo '<body style="background-color: black; margin: 0px;">';
             echo '<div id="selectors">
                 <select id="episodes" class="selectpicker" onchange="changeEpisode(this.selectedIndex)"></select>
