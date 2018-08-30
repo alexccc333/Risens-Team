@@ -37,8 +37,8 @@ $head[] = new Extension('link',
 $head[] = new Extension('script',
 			'player/videojs-logobrand.js');
 
-$head[] = new Extension('script',
-			'player/videojs-preroll.js');
+/*$head[] = new Extension('script',
+			'player/videojs-preroll.js');*/
 
 $head[] = new Extension('script',
 			'player/videojs-nuevo.js');

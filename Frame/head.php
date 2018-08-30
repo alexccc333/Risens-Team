@@ -2,7 +2,7 @@
 $head = array();
 
 $head[] = new Extension('link', 
-			'Styles/GetNewAnime.css', 
+			'https://risens.team/risensteam/Styles/GetNewAnime.css', 
 			'stylesheet');
 
 $head[] = new Extension('link',

@@ -22,7 +22,7 @@ class GetManga extends Main {
 	const COL_CHAPTER_ALIAS = 'name';
 	const COL_NAME = 'name';
     
-    const DL_LINK = 'http://risensteam.ru/dl.php';
+    const DL_LINK = 'http://risens.team/risensteam/dl.php';
     const CHAPTER_PARAMETER = 'chapter_id=';
 	
 	public function __construct($id, $mysqli, $currentChapterId) {
@@ -106,7 +106,7 @@ class GetManga extends Main {
 		echo file_get_contents('Scripts/MangaSelector.js');
 		echo '</script>';
 		
-		echo '<a href="" target="_blank"><img src="http://risensteam.ru/images/lupa.png" width="32px" height="32px" style="cursor: pointer;"></a><br>';
+		echo '<a href="" target="_blank"><img src="http://risens.team/risensteam/images/lupa.png" width="32px" height="32px" style="cursor: pointer;"></a><br>';
 		echo '<img id="before" style="display: none;">';
 		echo '<a id="link"><img id="current" onclick="change_page_next();" style="cursor: pointer; margin: 0 auto;" class="img-responsive"></a>';
 		echo '<img id="after" style="display: none;"><img id="original" style="display: none;"><br><br>';

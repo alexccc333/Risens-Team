@@ -10,6 +10,17 @@ include 'Frame/Extension.php';
 include 'Frame/GetAnime.php';
 
 $id = intval($_GET['id']);
+switch($_GET['marker']) {
+	case 'waka':
+		$marker = 'waka';
+		break;
+	case 'sovetromantica':
+	    $marker = 'sovetromantica';
+	    break;
+	default:
+		$marker = 'risens';
+		break;
+}
 $frame = new GetAnime($id, $mysqli);
 
 if (!$frame->getData()) {
@@ -19,4 +30,4 @@ if (!$frame->getData()) {
 include 'Frame/head.php'; // Подключаем набор хедеров
 $frame->setHead($head); // Линкуем основу и хедеры
 $frame->printHead();
-$frame->printBody();
+$frame->printBody($marker);

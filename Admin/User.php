@@ -24,7 +24,7 @@ class User {
 	
 	public function __construct() {
 		$this->_role = UserEnum::ROLE_ANON;
-        $this->_ip = $_SERVER['REMOTE_ADDR'];
+        $this->_ip = $_SERVER['HTTP_CF_CONNECTING_IP'];
 	}
 	
     public function login($login, $password, $mysqli) {

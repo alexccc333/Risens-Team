@@ -14,18 +14,18 @@ class GetAnime extends Main {
 	const DUB_PATHS = 'dubpaths';
 	const NAMES = 'names';
 	const IDS = 'ids';
-	
+
 	const COL_SUB_VIDEO_ID = 'subvideoid';
 	const COL_DUB_VIDEO_ID = 'dubvideoid';
 	const COL_SUB_PATH = 'subpath';
 	const COL_DUB_PATH = 'dubsubpath';
 	const COL_NAME = 'name';
 	const COL_ID = 'id';
-	
-	public function __construct($id, $mysqli) {
+
+	public function __construct($id, $mysqli, $type='risens') {
 		$this->_id = $id;
 		$this->_mysqli = $mysqli;
-		$this->_loadPosterAndRedirect();		
+		$this->_loadPosterAndRedirect();
 	}
 
 	protected function _loadPosterAndRedirect() {
@@ -40,10 +40,10 @@ class GetAnime extends Main {
 	public function getPoster() {
 		return $this->_poster;
 	}
-	
+
 	public function getData() {
 		if (!$this->_data) {
-			$sql = 'SELECT * FROM episodes WHERE anime_id = ' . $this->_id . 
+			$sql = 'SELECT * FROM episodes WHERE anime_id = ' . $this->_id .
 						' ORDER BY (number+0) DESC';
 			$result = $this->_mysqli->query($sql);
 
@@ -72,7 +72,7 @@ class GetAnime extends Main {
 				$this->_data = $returnArray;
 				return $returnArray;
 			}
-			
+
 			$this->_data = false;
 			return false;
 		}
@@ -80,23 +80,37 @@ class GetAnime extends Main {
 			return $this->_data;
 		}
 	}
-	
-	public function printBody() {
+
+	public function printBody($marker = 'risens') {
         if ($this->_redirect !== '') {
             if ($this->_data[self::SUB_IDS] === '' && $this->_data[self::DUB_IDS] === '') {
                 $showPlayer = false;
             } else {
-                include('SxGeo.php'); 
+                /*include('SxGeo.php');
                 $sxGeo = new SxGeo();
                 $ip = $_SERVER['REMOTE_ADDR'];
-                $country = $sxGeo->getCountry($ip);
-                $showPlayer = $country !== 'RU';
+                $country = $sxGeo->getCountry($ip);*/
+                $country = $_SERVER["HTTP_CF_IPCOUNTRY"];
+                $showPlayer = $country !== 'RU' && $country !== 'FR';
             }
         }
         else {
             $showPlayer = true;
         }
-        
+
+				switch ($marker) {
+					case 'waka':
+						$preroll = 'player/wakanim_temp_2.mp4';
+						break;
+                    case 'sovetromantica':
+                        $preroll = 'player/sovetromantica.mp4';
+                        break;
+					case 'risens':
+					default:
+						$preroll = 'player/newzastavka.mp4';
+						break;
+				}
+
         if ($showPlayer) {
             echo '<body style="background-color: black; margin: 0px;">';
             echo '<div id="selectors">
@@ -108,12 +122,12 @@ class GetAnime extends Main {
 				<div class="dropdown-menu dropdown-content" aria-labelledby="dropdownDownloadButton">
 					<iframe id="downloadContent" width="100%"></iframe>
 				</div>
-				
+
                 </div>';
             echo '<video id="mv" class="video-js vjs-default-skin vjs-big-play-centered" playsinline>
-                <source id ="vide" src="player/newzastavka.mp4" type="video/mp4">
+                <source id ="vide" src="'. $preroll . '" type="video/mp4">
                 </video>';
-        
+
             echo '<iframe id="player" src="" width="100%" height="100%" frameborder="0" allowfullscreen=""></iframe>';
 
             echo '<script>';
@@ -133,11 +147,11 @@ class GetAnime extends Main {
             echo '<div class="overlay"><a href="' . $this->_redirect . '" target="_blank">';
             echo '<img class="thumbnail" width=100% height=100% src="' . $this->_poster . '"></a>';
 			echo '<a href="' . $this->_redirect . '" class="playWrapper" target="_blank">';
-			echo '<span class="playBtn"><img src="Player/play-button.png" width="50" height="50" alt=""></span>';
+			echo '<span class="playBtn"><img src="https://risens.team/risensteam/Player/play-button.png" width="50" height="50" alt=""></span>';
 			echo '</a></div></body>';
         }
 	}
-	
+
 	public function getName() {
 		return $this->_name;
 	}

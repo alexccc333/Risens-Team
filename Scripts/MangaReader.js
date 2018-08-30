@@ -37,6 +37,7 @@ function draw(k){
         if (zoomed==true) document.getElementById("current").style.height=(window.screen.height*0.93)+"px";
         else document.getElementById("current").style.height=document.getElementById("original").style.height;
         if (x+1<pages.length) document.getElementById("after").src=pages[x+1];
+        fitWindow();
         //document.getElementById("current").scrollIntoView();
         
 }

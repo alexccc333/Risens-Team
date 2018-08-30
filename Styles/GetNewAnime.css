@@ -1,7 +1,7 @@
 select#episodes, select#episodes-color, select#subdub, select#subdub-color, select#players, select#players-color 
 {
    -webkit-appearance: button;
-   background-image: url(http://i62.tinypic.com/15xvbd5.png), -webkit-linear-gradient(#FAFAFA, #F4F4F4 40%, #E5E5E5);
+   background-image: url(https://risens.team/risensteam/images/15xvbd5.png), -webkit-linear-gradient(#FAFAFA, #F4F4F4 40%, #E5E5E5);
    background-position: 97% center;
    background-repeat: no-repeat;
    border: 1px solid #AAA;

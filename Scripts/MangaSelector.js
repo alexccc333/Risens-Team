@@ -4,3 +4,12 @@ var x = document.getElementById("pageselect");
         option.text = i + 1;
         x.add(option);
     };
+$( document ).ready(function() {
+    fitWindow();
+});
+
+function fitWindow() {
+	/*var iframe = $('#reader', parent.document.body);
+    iframe.height(document.body.scrollHeight + 135);
+    console.log('good');*/
+}

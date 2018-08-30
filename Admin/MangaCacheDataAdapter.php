@@ -1,5 +1,5 @@
 <?php
-require_once 'Admin/DataAdapter.php';
+require_once 'DataAdapter.php';
 
 class MangaCacheDataAdapter extends DataAdapter {
     

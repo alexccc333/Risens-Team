@@ -45,6 +45,8 @@ class Router extends Main {
     }
     
     public function printBody($location = '') {
+        error_reporting(E_ALL);
+ini_set('display_errors', 1);
         echo '<body>';
         if ($this->_currentUser->isAnon()){ 
             $status = $this->_currentUser->isLogged();
@@ -309,7 +311,7 @@ class Router extends Main {
             if ($animeId) {
                 $logArray[Logger::STATUS] = Logger::STATUS_OK;
                 echo '<h3><p class="text-center">Anime created</p></h3><hr>';
-                echo '<input type="text" value="http://risensteam.ru/getnewanime.php?id=' . $animeId . '">';
+                echo '<input type="text" value="http://risens.team/risensteam/getnewanime.php?id=' . $animeId . '">';
             }
             else {
                 $logArray[Logger::STATUS] = Logger::STATUS_FAIL;
@@ -552,13 +554,13 @@ class Router extends Main {
                         if (isset($_FILES['sub_file']) && $_FILES['sub_file']['error'] == UPLOAD_ERR_OK) {
                             $tmp_name = $_FILES['sub_file']['tmp_name'];
                             move_uploaded_file($tmp_name, './anime/sub_' . $episodeId . '.ass');
-                            $episode[EpisodeDataAdapter::COL_SUB_PATH] = 'http://risensteam.ru/anime/sub_' . $episodeId . '.ass';
+                            $episode[EpisodeDataAdapter::COL_SUB_PATH] = 'https://risens.team/risensteam/anime/sub_' . $episodeId . '.ass';
                         }
                         
                         if (isset($_FILES['dub_sub_file']) && $_FILES['dub_sub_file']['error'] == UPLOAD_ERR_OK) {
                             $tmp_name = $_FILES['dub_sub_file']['tmp_name'];
                             move_uploaded_file($tmp_name, './anime/dub_' . $episodeId . '.ass');
-                            $episode[EpisodeDataAdapter::COL_DUB_SUB_PATH] = 'http://risensteam.ru/anime/dub_' . $episodeId . '.ass';
+                            $episode[EpisodeDataAdapter::COL_DUB_SUB_PATH] = 'https://risens.team/risensteam/anime/dub_' . $episodeId . '.ass';
                         }
                         $episodeAdapter->updateEpisode($episodeId, $episode[EpisodeDataAdapter::COL_NAME], $episode[EpisodeDataAdapter::COL_NUMBER],
                             $episode[EpisodeDataAdapter::COL_SUB_VIDEO_ID], $episode[EpisodeDataAdapter::COL_SUB_PATH],
@@ -626,12 +628,15 @@ class Router extends Main {
                     if (isset($_FILES['sub_file']) && $_FILES['sub_file']['error'] == UPLOAD_ERR_OK) {
                         $tmp_name = $_FILES['sub_file']['tmp_name'];
                         move_uploaded_file($tmp_name, './anime/sub_' . $episodeId . '.ass');
-                        $episode[EpisodeDataAdapter::COL_SUB_PATH] = 'http://risensteam.ru/anime/sub_' . $episodeId . '.ass';
+                        $episode[EpisodeDataAdapter::COL_SUB_PATH] = 'https://risens.team/risensteam/anime/sub_' . $episodeId . '.ass';
+                    }
+                    else {
+
                     }
                     if (isset($_FILES['dub_sub_file']) && $_FILES['dub_sub_file']['error'] == UPLOAD_ERR_OK) {
                         $tmp_name = $_FILES['dub_sub_file']['tmp_name'];
                         move_uploaded_file($tmp_name, './anime/dub_' . $episodeId . '.ass');
-                        $episode[EpisodeDataAdapter::COL_DUB_SUB_PATH] = 'http://risensteam.ru/anime/dub_' . $episodeId . '.ass';
+                        $episode[EpisodeDataAdapter::COL_DUB_SUB_PATH] = 'https://risens.team/risensteam/anime/dub_' . $episodeId . '.ass';
                     }
                     
                     $episodeAdapter->updateEpisode($episodeId, $episode[EpisodeDataAdapter::COL_NAME], $episode[EpisodeDataAdapter::COL_NUMBER],
@@ -812,7 +817,7 @@ class Router extends Main {
                     $chapter[ChapterDataAdapter::COL_NAME] = $_POST['name'];
                     $chapter[ChapterDataAdapter::COL_NUMBER] = $_POST['number'];
                     $chapter[ChapterDataAdapter::COL_CHAPTER_NAME] = $_POST['chapter_name'];
-                    $chapter[ChapterDataAdapter::COL_DOWNLOAD] = $_POST['download'];
+                    //$chapter[ChapterDataAdapter::COL_DOWNLOAD] = $_POST['download'];
                     
                     if (isset($_FILES['chapter_files'])) {
                         $yandexAdapter->createFolder(YandexDiskAdapter::MANGA_FOLDER . '/' . $chapterId);

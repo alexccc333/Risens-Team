@@ -45,7 +45,7 @@ function startPlayer() {
 
 function changeDubSub(e) {
     var type = "";
-	var src = "http://risensteam.ru/dl.php?episode_id=" + ids[selectedEpisode];
+	var src = "https://risens.team/risensteam/dl.php?episode_id=" + ids[selectedEpisode];
 	if (e == "Субтитры") {
 		type = "sub";
 		subs = true;
@@ -55,7 +55,7 @@ function changeDubSub(e) {
 		subs = false;
 		src = src + "&dub";
 	}
-	document.getElementById("player").src="http://risensteam.ru/player.php?id="+ids[selectedEpisode]+"&type="+type;
+	document.getElementById("player").src="https://risens.team/risensteam/player.php?id="+ids[selectedEpisode]+"&type="+type;
 	
 	document.getElementById("downloadContent").src = src;
 }
